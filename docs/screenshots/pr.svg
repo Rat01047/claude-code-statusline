@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="891" height="104" viewBox="0 0 891 104">
+<rect width="100%" height="100%" rx="10" fill="#282a36"/>
+<circle cx="24" cy="19" r="6" fill="#ff5555"/>
+<circle cx="44" cy="19" r="6" fill="#f1fa8c"/>
+<circle cx="64" cy="19" r="6" fill="#50fa7b"/>
+<text x="446" y="24" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" text-anchor="middle">On a PR branch</text>
+<path d="M27.4,44 A11.0,11.0 0 0 0 27.4,66 Z" fill="#0abab5"/>
+<rect x="27.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="36.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="45.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="54.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<path d="M63.0,44 A11.0,11.0 0 0 1 63.0,66 Z" fill="#0abab5"/>
+<text x="27.0" y="59.8" fill="#000000" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" font-weight="bold" textLength="36.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Work</text>
+<text x="81.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="99.0" y="59.8" fill="#bd93f9" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="99.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">◆ Fable 5.1</text>
+<text x="207.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="54.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">· high</text>
+<text x="270.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="288.0" y="59.8" fill="#bd93f9" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="72.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Acme-Api</text>
+<text x="369.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="387.0" y="59.8" fill="#8be9fd" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="63.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">PR #123</text>
+<text x="459.0" y="59.8" fill="#f8f8f2" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="270.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Fix coupon stacking on bundles</text>
+<text x="738.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="756.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="117.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Review PR 123</text>
+<rect x="54.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="63.0" y="71.5" width="9.4" height="16.5" fill="#77db75"/>
+<rect x="72.0" y="71.5" width="9.4" height="16.5" fill="#a5db7a"/>
+<rect x="81.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="90.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="99.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="108.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="117.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="126.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="135.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="234.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="243.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="261.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="270.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="279.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="288.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="297.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="306.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="315.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="414.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="423.0" y="71.5" width="9.4" height="16.5" fill="#77db75"/>
+<rect x="432.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="441.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="450.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="459.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="468.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="486.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="495.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<text x="18.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">ctx</text>
+<text x="153.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">34%</text>
+<text x="189.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="207.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="18.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">5h</text>
+<text x="252.0" y="81.8" fill="#ff79c6" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="333.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">18%</text>
+<text x="369.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="387.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="18.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">7d</text>
+<text x="477.0" y="81.8" fill="#ff79c6" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="513.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">22%</text>
+<text x="549.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="567.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="45.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">$3.12</text>
+</svg>

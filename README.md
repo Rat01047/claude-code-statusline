@@ -1,0 +1,139 @@
+# claude-code-statusline
+
+A two-row status line for [Claude Code](https://docs.claude.com/en/docs/claude-code). It tells
+you, at a glance:
+
+- **which login** you are on (work or personal), as a coloured chip;
+- **which model and effort level** is running;
+- **which project and PR** you are on, read from your folder and branch names (and, if you
+  opt in, which ticket);
+- **how close you are to the limits**: context, the 5-hour and the 7-day windows, each with
+  a pace marker, so you can see whether you are burning through a window too fast.
+
+![Inside a ticket folder, with TICKET_PATTERN set](docs/screenshots/wide.svg)
+
+The images on this page are drawn from made-up sessions by `tools/screenshots.sh`.
+
+## What each part means
+
+**Row 1**: account chip │ model · effort │ project folder (· git branch) │ ticket or PR │ session name
+
+| Part | Where it comes from |
+|---|---|
+| Account chip | The login in `~/.claude.json` (`oauthAccount.emailAddress`), with the label and colours you set. An unknown login shows the part of its address before the `@`, in grey. |
+| ◆ Model · effort | Claude Code's status JSON. Opus is orange, Fable purple, anything else cyan. |
+| Folder · branch | The project folder name and current git branch. Inside a ticket folder it still shows the project folder above it. |
+| Ticket | Optional, off by default. If you keep one folder per ticket and set `TICKET_PATTERN`, the ticket folder you are in, e.g. `tickets/2026-10-28 [#42] Coupon-applies-twice`, shows as **#42 Coupon applies twice**. A folder ending in ` - DONE` adds *(done)*. |
+| PR | From a branch named like `pr/123`, `fix/pr-123` or `feature-pr123`. The title is fetched with `gh pr view` in the background and cached for an hour, so the line never waits on the network. |
+| Session name | Set with `/rename`, or `CLAUDE_TASK=...`. It is shortened, or dropped, before anything else when the pane is narrow. |
+
+**Row 2**: ctx │ 5h │ 7d │ cost
+
+- Bars fill green → yellow → orange → red along the track. The percent is green below 50%,
+  yellow to 79%, red from 80%.
+- The pink **│** on the 5h and 7d bars is **pace**: how much of that window has already
+  passed. Fill ahead of the marker means you are using the limit faster than it refills.
+- **↻ 2h52m** is the time until that limit resets. It only appears once a limit reaches 70%.
+- Bar cells are ¾-height blocks, which leaves a sliver of space between the two rows.
+
+![Near the limits](docs/screenshots/limits.svg)
+
+![On a PR branch](docs/screenshots/pr.svg)
+
+In a narrow pane the line wraps by whole parts and the bars shrink, never past three lines:
+
+![A narrow pane](docs/screenshots/narrow.svg)
+
+## Requirements
+
+- **zsh** and **jq**.
+- A terminal with 24-bit colour (Warp, iTerm2, WezTerm, Kitty, Ghostty).
+- Optional: **[gh](https://cli.github.com)**, logged in, for PR titles.
+- Optional: a **[Nerd Font](https://www.nerdfonts.com)** for the rounded chip ends (`PILL=1`).
+
+Tested on macOS. The script uses only zsh built-ins and POSIX tools (`cksum`, `zstat`) for
+its caches, so Linux should work, but it has not been tested there yet.
+
+## Install
+
+```sh
+git clone https://github.com/Rat01047/claude-code-statusline.git
+cp claude-code-statusline/statusline.sh ~/.claude/statusline.sh
+chmod +x ~/.claude/statusline.sh
+```
+
+Then add this to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 0
+  }
+}
+```
+
+The new line shows on the next refresh of each Claude Code session.
+
+## Configure
+
+Everything works without a config file. To name your logins and colour their chips, copy the
+example and edit it:
+
+```sh
+mkdir -p ~/.config/claude-statusline
+cp claude-code-statusline/config.example.zsh ~/.config/claude-statusline/config.zsh
+```
+
+| Setting | Default | What it does |
+|---|---|---|
+| `ACCOUNTS` | none | `'email\|Label\|bg r;g;b\|text r;g;b'`, one per login. |
+| `PILL` | `0` | `1` gives the chip rounded ends (needs a Nerd Font). |
+| `TICKET_PATTERN` | `''` (off) | Regex for your ticket folders; the first group is the folder's name. The example config has `'/tickets/([^/]+)'`. |
+| `TICKET_MAX` | `40` | Longest ticket title shown. |
+| `PR_TITLES` | `1` | `0` never calls `gh`. |
+
+Set `CLAUDE_STATUSLINE_CONF` to keep the file somewhere else. The file runs as zsh code, so
+it is skipped unless you own it and it is not world-writable.
+
+## What it reads, runs and writes
+
+So you know before you install it:
+
+- **Reads** the status JSON Claude Code passes on stdin, and `oauthAccount.emailAddress` from
+  `~/.claude.json` (or `$CLAUDE_CONFIG_DIR/.claude.json`). Nothing else in that file.
+- **Runs** `git` in your working folder (branch name, cached 5 seconds) and, when you are on a
+  PR branch and `PR_TITLES=1`, `gh pr view <number> --json title` in the background.
+- **Writes** small cache files to `$TMPDIR/claude-statusline-<uid>/`, a folder only you can
+  read (mode 700). If that folder is a link, belongs to someone else or is open to others
+  (another user got there first in a shared `/tmp`), nothing is cached and no PR title is
+  fetched; the line still works.
+- **Prints names as text.** Control characters are removed from folder, ticket, branch, model
+  and session names, so a name carrying terminal escape codes cannot retitle or clear your
+  window. A PR number must be digits before it reaches `gh`.
+- Sends nothing anywhere itself; `gh` talks to GitHub the way it always does.
+
+## Tests
+
+```sh
+zsh tests/run.sh
+```
+
+The tests drive the script with made-up accounts (`work@example.com`, `home@example.com`) and
+folders (`Acme-Shop`) in a throwaway HOME, so they never read your real login or caches. They
+check the layout, colours, bar fill and pace marker, wrapping at five pane widths, every config
+switch, the git and PR handling (with a stand-in `gh`), and the cache folder's permissions.
+
+To redraw the screenshots: `zsh tools/screenshots.sh`.
+
+## Credits
+
+The bar's gradient, pace marker and percent bands are adapted from
+[briansmith80/claude-code-status-bar](https://github.com/briansmith80/claude-code-status-bar)
+(MIT). Colours are from [Dracula](https://draculatheme.com). See
+[THIRD-PARTY.md](THIRD-PARTY.md).
+
+## License
+
+[MIT](LICENSE)

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="801" height="104" viewBox="0 0 801 104">
+<rect width="100%" height="100%" rx="10" fill="#282a36"/>
+<circle cx="24" cy="19" r="6" fill="#ff5555"/>
+<circle cx="44" cy="19" r="6" fill="#f1fa8c"/>
+<circle cx="64" cy="19" r="6" fill="#50fa7b"/>
+<text x="400" y="24" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="13" text-anchor="middle">Inside a ticket folder, with TICKET_PATTERN set</text>
+<path d="M27.4,44 A11.0,11.0 0 0 0 27.4,66 Z" fill="#0abab5"/>
+<rect x="27.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="36.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="45.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<rect x="54.0" y="44" width="9.4" height="22" fill="#0abab5"/>
+<path d="M63.0,44 A11.0,11.0 0 0 1 63.0,66 Z" fill="#0abab5"/>
+<text x="27.0" y="59.8" fill="#000000" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" font-weight="bold" textLength="36.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Work</text>
+<text x="81.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="99.0" y="59.8" fill="#ffb86c" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="90.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">◆ Opus 5.5</text>
+<text x="198.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="54.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">· high</text>
+<text x="261.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="279.0" y="59.8" fill="#bd93f9" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="81.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Acme-Shop</text>
+<text x="369.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="387.0" y="59.8" fill="#8be9fd" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">#42</text>
+<text x="423.0" y="59.8" fill="#f8f8f2" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="180.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Coupon applies twice</text>
+<text x="612.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="630.0" y="59.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="153.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Checkout refactor</text>
+<rect x="54.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="63.0" y="71.5" width="9.4" height="16.5" fill="#77db75"/>
+<rect x="72.0" y="71.5" width="9.4" height="16.5" fill="#a5db7a"/>
+<rect x="81.0" y="71.5" width="9.4" height="16.5" fill="#d3db7f"/>
+<rect x="90.0" y="71.5" width="9.4" height="16.5" fill="#d6c977"/>
+<rect x="99.0" y="71.5" width="9.4" height="16.5" fill="#dab66e"/>
+<rect x="108.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="117.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="126.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="135.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="234.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="243.0" y="71.5" width="9.4" height="16.5" fill="#77db75"/>
+<rect x="252.0" y="71.5" width="9.4" height="16.5" fill="#a5db7a"/>
+<rect x="261.0" y="71.5" width="9.4" height="16.5" fill="#d3db7f"/>
+<rect x="279.0" y="71.5" width="9.4" height="16.5" fill="#dab66e"/>
+<rect x="288.0" y="71.5" width="9.4" height="16.5" fill="#dfa364"/>
+<rect x="297.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="306.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="315.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="486.0" y="71.5" width="9.4" height="16.5" fill="#4adb71"/>
+<rect x="495.0" y="71.5" width="9.4" height="16.5" fill="#77db75"/>
+<rect x="504.0" y="71.5" width="9.4" height="16.5" fill="#a5db7a"/>
+<rect x="513.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="522.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="531.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="540.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="558.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<rect x="567.0" y="71.5" width="9.4" height="16.5" fill="#44475a"/>
+<text x="18.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">ctx</text>
+<text x="153.0" y="81.8" fill="#f1fa8c" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">65%</text>
+<text x="189.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="207.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="18.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">5h</text>
+<text x="270.0" y="81.8" fill="#ff79c6" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="333.0" y="81.8" fill="#f1fa8c" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">74%</text>
+<text x="369.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="63.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">↻ 2h52m</text>
+<text x="441.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="459.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="18.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">7d</text>
+<text x="549.0" y="81.8" fill="#ff79c6" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="585.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">30%</text>
+<text x="621.0" y="81.8" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
+<text x="639.0" y="81.8" fill="#50fa7b" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="45.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">$3.12</text>
+</svg>
