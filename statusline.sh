@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 # claude-code-statusline: a two-row status line for Claude Code.
 # Dracula colours, gradient usage bars with a pace marker, an account chip, and the PR (or,
 # if you opt in, the ticket) you are working on, read from your branch and folder names.

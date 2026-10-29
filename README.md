@@ -56,13 +56,17 @@ its caches, so Linux should work, but it has not been tested there yet.
 
 ## Install
 
+Already have a `~/.claude/statusline.sh`? Back it up first, because the copy below replaces it:
+`cp ~/.claude/statusline.sh ~/.claude/statusline.sh.bak`.
+
 ```sh
 git clone https://github.com/Rat01047/claude-code-statusline.git
 cp claude-code-statusline/statusline.sh ~/.claude/statusline.sh
 chmod +x ~/.claude/statusline.sh
 ```
 
-Then add this to `~/.claude/settings.json`:
+Then add the `statusLine` block to `~/.claude/settings.json`. If the file already has other
+settings, add the block next to them; don't replace the file:
 
 ```json
 {
