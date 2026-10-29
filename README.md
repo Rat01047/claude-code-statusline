@@ -1,14 +1,17 @@
 # claude-code-statusline
 
-A two-row status line for [Claude Code](https://docs.claude.com/en/docs/claude-code). It tells
-you, at a glance:
+**Are you using your Claude limits faster than they refill?** This two-row status line for
+[Claude Code](https://docs.claude.com/en/docs/claude-code) answers that at a glance. The 5-hour
+and 7-day usage bars each carry a pink pace marker, showing how much of the window has passed.
+When the fill runs ahead of the marker, you are on track to hit the limit before it resets.
+
+It also shows:
 
 - **which Claude login** is active, as a coloured chip (handy if you switch accounts);
 - **which model and effort level** is running;
 - **which project and PR** you are on, read from your folder and branch names (and, if you
   opt in, which ticket);
-- **how close you are to the limits**: context, the 5-hour and the 7-day windows, each with
-  a pace marker, so you can see whether you are burning through a window too fast.
+- **how full the context window is**, and what the session has cost so far.
 
 ![Inside a ticket folder, with TICKET_PATTERN set](docs/screenshots/wide.svg)
 
