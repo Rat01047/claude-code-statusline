@@ -3,7 +3,7 @@
 A two-row status line for [Claude Code](https://docs.claude.com/en/docs/claude-code). It tells
 you, at a glance:
 
-- **which login** you are on (work or personal), as a coloured chip;
+- **which Claude login** is active, as a coloured chip (handy if you switch accounts);
 - **which model and effort level** is running;
 - **which project and PR** you are on, read from your folder and branch names (and, if you
   opt in, which ticket);
@@ -20,7 +20,7 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 
 | Part | Where it comes from |
 |---|---|
-| Account chip | The login in `~/.claude.json` (`oauthAccount.emailAddress`), with the label and colours you set. An unknown login shows the part of its address before the `@`, in grey. |
+| Account chip | Which Claude login is active, read from `~/.claude.json` (`oauthAccount.emailAddress`). Useful if you switch between accounts, with `/login` or a tool such as [claude-swap](https://github.com/realiti4/claude-swap): name each login and give it a colour in the config (the screenshots use "Work" and "Home"). Without a config it shows the part of your address before the `@`, in grey. One login and no need for it? `SHOW_ACCOUNT=0` hides it. |
 | ◆ Model · effort | Claude Code's status JSON. Opus is orange, Fable purple, anything else cyan. |
 | Folder · branch | The project folder name and current git branch. Inside a ticket folder it still shows the project folder above it. |
 | Ticket | Optional, off by default. If you keep one folder per ticket and set `TICKET_PATTERN`, the ticket folder you are in, e.g. `tickets/2026-10-28 [#42] Coupon-applies-twice`, shows as **#42 Coupon applies twice**. A folder ending in ` - DONE` adds *(done)*. |
@@ -88,6 +88,7 @@ cp claude-code-statusline/config.example.zsh ~/.config/claude-statusline/config.
 
 | Setting | Default | What it does |
 |---|---|---|
+| `SHOW_ACCOUNT` | `1` | `0` hides the account chip and never reads `~/.claude.json`. |
 | `ACCOUNTS` | none | `'email\|Label\|bg r;g;b\|text r;g;b'`, one per login. |
 | `PILL` | `0` | `1` gives the chip rounded ends (needs a Nerd Font). |
 | `TICKET_PATTERN` | `''` (off) | Regex for your ticket folders; the first group is the folder's name. The example config has `'/tickets/([^/]+)'`. |
@@ -102,7 +103,8 @@ it is skipped unless you own it and it is not world-writable.
 So you know before you install it:
 
 - **Reads** the status JSON Claude Code passes on stdin, and `oauthAccount.emailAddress` from
-  `~/.claude.json` (or `$CLAUDE_CONFIG_DIR/.claude.json`). Nothing else in that file.
+  `~/.claude.json` (or `$CLAUDE_CONFIG_DIR/.claude.json`). Nothing else in that file, and not
+  even that with `SHOW_ACCOUNT=0`.
 - **Runs** `git` in your working folder (branch name, cached 5 seconds) and, when you are on a
   PR branch and `PR_TITLES=1`, `gh pr view <number> --json title` in the background.
 - **Writes** small cache files to `$TMPDIR/claude-statusline-<uid>/`, a folder only you can

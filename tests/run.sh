@@ -105,6 +105,16 @@ print -r -- "source $FX/config.zsh; PILL=0" >$W/square.zsh
 R=$(print -r -- "$(mk "$A" "$A" 40 30 20)" | CLAUDE_STATUSLINE_CONF=$W/square.zsh COLUMNS=157 "$F")
 check "PILL=0: padded square chip, no Nerd Font caps" "$R" \
   '[[ "$(line "$R" 1 | strip)" == " Work  │"* && "$R" != *$CAPL* ]]'
+print -r -- "source $FX/config.zsh; SHOW_ACCOUNT=0" >$W/nochip.zsh
+P=$(print -r -- "$(mk "$A" "$A" 40 30 20)" | CLAUDE_STATUSLINE_CONF=$W/nochip.zsh COLUMNS=157 "$F" | strip)
+check "SHOW_ACCOUNT=0: no chip, row 1 starts at the model" "$P" '[[ "$(line "$P" 1)" == "◆ Opus 5.5 · high │ Acme-Shop │"* && "$P" != *Work* ]]'
+print -r -- "SHOW_ACCOUNT=0" >$W/nochip2.zsh
+P=$(print -r -- "$(mk "$A" "$A" 40 30 20)" | CLAUDE_STATUSLINE_CONF=$W/nochip2.zsh CLAUDE_CONFIG_DIR=$FX/other COLUMNS=157 "$F" | strip)
+check "SHOW_ACCOUNT=0 with an unknown login: its name is not shown either" "$P" '[[ "$P" != *someone* && "$(line "$P" 1)" == "◆ Opus 5.5"* ]]'
+P=$(print -r -- '{}' | CLAUDE_STATUSLINE_CONF=$W/nochip.zsh COLUMNS=157 "$F" 2>&1 | strip)
+check "SHOW_ACCOUNT=0 with empty JSON: no output at all, no error" "$(print -r -- "$P" | od -c)" '[[ -z "$P" ]] && (( $(print -r -- '"'"'{}'"'"' | CLAUDE_STATUSLINE_CONF=$W/nochip.zsh COLUMNS=157 "$F" | wc -c) == 0 ))'
+P=$(print -r -- '{"session_name":"Solo"}' | CLAUDE_STATUSLINE_CONF=$W/nochip.zsh COLUMNS=157 "$F" | strip)
+check "SHOW_ACCOUNT=0, only a session name: the name alone, no leading separator" "$P" '[[ "$P" == "Solo" ]]'
 print -r -- "source $FX/config.zsh; TICKET_PATTERN=''" >$W/noticket.zsh
 P=$(print -r -- "$(mk "$T" "$A" 40 30 20)" | CLAUDE_STATUSLINE_CONF=$W/noticket.zsh COLUMNS=157 "$F" | strip)
 check "TICKET_PATTERN='': ticket parsing off" "$P" '[[ "$P" != *"#42"* ]]'

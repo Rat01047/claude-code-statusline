@@ -1,7 +1,11 @@
 # Copy to ~/.config/claude-statusline/config.zsh (or point CLAUDE_STATUSLINE_CONF at it).
 # Every setting is optional; delete what you don't need.
 
-# Account chip: one entry per login, "email|Label|background r;g;b|text r;g;b".
+# Account chip: shows which Claude login is active, handy if you switch accounts.
+# SHOW_ACCOUNT=0 hides it.
+SHOW_ACCOUNT=1
+
+# One entry per login, "email|Label|background r;g;b|text r;g;b".
 # The email is the one Claude Code shows under /status. A login not listed here
 # shows the part of its address before the @, in grey.
 ACCOUNTS=(

@@ -7,9 +7,9 @@
 #   Work │ ◆ Opus 5.5 · high │ Acme-Shop │ #42 Coupon applies twice │ Checkout refactor
 #   ctx ▆▆▆▆▆▆▆▆▆▆ 65% │ 5h ▆▆▆▆│▆▆▆▆▆ 74% ↻ 2h52m │ 7d ▆▆▆▆▆▆▆│▆▆ 30% │ $3.12
 #
-# Row 1: account chip (the login Claude Code is using, from .claude.json), model · effort,
-#   project folder (· git branch), the ticket or PR you are on, then the session name, which
-#   is shortened or dropped first when the pane is narrow.
+# Row 1: account chip (the login Claude Code is using, from .claude.json; SHOW_ACCOUNT=0
+#   hides it), model · effort, project folder (· git branch), the ticket or PR you are on,
+#   then the session name, which is shortened or dropped first when the pane is narrow.
 # Row 2: context, 5-hour and 7-day limits, session cost. Bar cells are ¾-height blocks, which
 #   leaves a sliver of space under row 1. Filled cells run green > yellow > orange > red;
 #   the percent is green below 50%, yellow to 79%, red from 80%.
@@ -28,6 +28,7 @@ setopt extendedglob
 zmodload -F zsh/stat b:zstat 2>/dev/null
 
 # --- Settings (override in the config file) ---
+SHOW_ACCOUNT=1                    # 0 = no account chip (and .claude.json is never read)
 ACCOUNTS=()                       # "email|Label|bg r;g;b|fg r;g;b", one entry per login
 PILL=0                            # 1 = rounded chip ends (needs a Nerd Font)
 TICKET_PATTERN=''                 # regex; match[1] = the ticket folder name. '' = off
@@ -192,8 +193,9 @@ key() { print -rn -- "$1" | cksum | cut -d' ' -f1; }
 age() { local m; m=$(zstat +mtime "$1" 2>/dev/null) || { print 999999; return; }; print $(($(date +%s) - m)); }
 
 # Account: which login Claude Code is using. Labels and colours come from ACCOUNTS;
-# an unknown login shows its address's local part, muted.
-ACCT_EMAIL="$(jq -r '.oauthAccount.emailAddress // empty' "${CLAUDE_CONFIG_DIR:-$HOME}/.claude.json" 2>/dev/null)"
+# an unknown login shows its address's local part, muted. SHOW_ACCOUNT=0 skips it all.
+ACCT_EMAIL=""
+((SHOW_ACCOUNT)) && ACCT_EMAIL="$(jq -r '.oauthAccount.emailAddress // empty' "${CLAUDE_CONFIG_DIR:-$HOME}/.claude.json" 2>/dev/null)"
 ACCT="" ACCT_BG="" ACCT_FG=""
 for a in "${ACCOUNTS[@]}"; do
   [[ "${a%%|*}" == "$ACCT_EMAIL" ]] || continue
@@ -211,8 +213,10 @@ if [[ -n "$ACCT" && -n "$ACCT_BG" ]]; then
   fi
 elif [[ -n "$ACCT_EMAIL" ]]; then
   CHIP="${MUTED}${ACCT:-${ACCT_EMAIL%%@*}}${RESET}"
-else
+elif ((SHOW_ACCOUNT)); then
   CHIP="${MUTED}no login${RESET}"
+else
+  CHIP=""
 fi
 
 # Git, cached 5s per folder so parallel tabs never read each other's branch.
@@ -281,7 +285,7 @@ elif [[ -n "$PR_NUM" ]]; then
   PR_SHOWN=1
 fi
 
-parts=("$CHIP")
+parts=(); [[ -n "$CHIP" ]] && parts+=("$CHIP")
 case "$MODEL" in
   *Opus*)  MODEL_C="$ORANGE" ;;
   *Fable*) MODEL_C="$PURPLE" ;;
@@ -305,7 +309,7 @@ fi
 [[ -n "$VIM" ]] && parts+=("${MUTED}[${VIM}]${RESET}")
 [[ -n "$STYLE" && "$STYLE" != "default" ]] && parts+=("${MUTED}style: ${STYLE}${RESET}")
 
-rows=("${(@f)$(emit "${parts[@]}")}")
+rows=("${(@f)$(emit "${parts[@]}")}"); rows=("${(@)rows:#}")   # no parts, no row
 
 # --- Row 2: context, 5h and 7d bars, cost ---
 COST_PART=""
@@ -341,10 +345,12 @@ TASK="${CLAUDE_TASK:-$SESSION}"
 TASK="${TASK//[[:cntrl:]]/}"
 if [[ -n "$TASK" ]]; then
   ((${#TASK} > 40)) && TASK="${TASK[1,39]}…"
-  room=$((MAXW - $(vis_width "${rows[-1]}") - SEP_W))
+  if ((${#rows})); then room=$((MAXW - $(vis_width "${rows[-1]}") - SEP_W)); else room=$MAXW; fi
   ((${#TASK} > room && room >= 12)) && TASK="${TASK[1,room-1]}…"
-  ((${#TASK} <= room)) && rows[-1]+="${SEP}${MUTED}${TASK}${RESET}"
+  if ((${#TASK} <= room)); then
+    if ((${#rows})); then rows[-1]+="${SEP}${MUTED}${TASK}${RESET}"; else rows=("${MUTED}${TASK}${RESET}"); fi
+  fi
 fi
-printf '%s\n' "${rows[@]}"
+((${#rows})) && printf '%s\n' "${rows[@]}"
 ((${#parts})) && emit "${parts[@]}"
 exit 0
