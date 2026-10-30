@@ -37,7 +37,9 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 - The pink **│** on the 5h and 7d bars is **pace**: how much of that window has already
   passed. Fill ahead of the marker means you are using the limit faster than it refills.
 - **↻ 2h52m** is the time until that limit resets. It only appears once a limit reaches 70%.
-- Bar cells are ■, which sits on the text baseline like a letter, so the bars line up with the labels and percents.
+- Bar cells are ■, which sits on the text baseline like a letter, so the bars line up with the labels and
+  percents. Measured in Hack Nerd Font Mono and MesloLGS NF, where ■ fills the cell; a font that draws it
+  narrower shows thin gaps between cells. Check yours with `swift tools/glyph-metrics.swift <font.ttf>`.
 
 ![Near the limits](docs/screenshots/limits.svg)
 
@@ -134,7 +136,8 @@ folders (`Acme-Shop`) in a throwaway HOME, so they never read your real login or
 check the layout, colours, bar fill and pace marker, wrapping at five pane widths, every config
 switch, the git and PR handling (with a stand-in `gh`), and the cache folder's permissions.
 
-To redraw the screenshots: `zsh tools/screenshots.sh`.
+To redraw the screenshots: `zsh tools/screenshots.sh`, then `zsh tools/social-preview.sh` for the
+social preview image (macOS).
 
 ## Credits
 

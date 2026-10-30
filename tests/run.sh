@@ -56,7 +56,7 @@ check "dracula: Opus orange, folder purple, ticket number cyan, title foreground
   '[[ "$R" == *"38;2;255;184;108m◆ Opus 5.5"* && "$R" == *"38;2;189;147;249mAcme-Shop"* && "$R" == *"38;2;139;233;253m#42"* && "$R" == *"38;2;248;248;242mCoupon applies"* && "$R" == *"38;2;80;250;123m\$3.12"* ]]'
 check "separators comment grey, track current-line grey, pace marker pink" "$R" \
   '[[ "$R" == *$'"'"'\e[38;2;98;114;164m│'"'"'* && "$R" == *"38;2;68;71;90m■"* && "$R" == *"38;2;255;121;198m│"* ]]'
-check "bars are ■ cells, sitting on the text baseline; no lines, blocks or shades" "$R" \
+check "bars are drawn with ■ only; no lines, blocks or shades" "$R" \
   '[[ "$R" == *■* && "$R" != *━* && "$R" != *▆* && "$R" != *█* && "$R" != *░* ]]'
 check "gradient: ctx bar has 6 different cell colours, first is the dimmed green" "$R" \
   '(( $(line "$R" 2 | grep -o $'"'"'\e\\[38;2;[0-9;]*m■'"'"' | head -6 | sort -u | wc -l) == 6 )) && [[ "$R" == *"38;2;74;219;113m■"* ]]'
@@ -67,6 +67,12 @@ check "percent colour: 65% and 74% yellow, 30% green" "$R" \
 R=$(run "$(mk "$T" "$A" 90 30 20)" 157)
 check "ctx 90%: percent red" "$R" '[[ "$R" == *"38;2;255;85;85m90%"* ]]'
 check "all limits under 70%: no reset time" "$R" '[[ "$R" != *"↻"* ]]'
+
+# 2b. Context label: window size other than 200k, and the over-200k warning.
+R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
+check "1M window: label reads CTX 1M" "$P" '[[ "$(line "$P" 2)" == "CTX 1M "* ]]'
+R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.exceeds_200k_tokens = true')" 157)
+check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mCTX >200k"* ]]'
 
 # 3. Project root: no ticket. Tab opened in the home folder: folder comes from the working folder.
 P=$(run "$(mk "$A" "$A" 40 30 20)" 157 | strip)
