@@ -5,13 +5,13 @@
 # Requires: zsh, jq. Optional: gh (PR titles), a Nerd Font (rounded account chip).
 #
 #   Work │ ◆ Opus 5.5 · high │ Acme-Shop │ #42 Coupon applies twice │ Checkout refactor
-#   ctx ▆▆▆▆▆▆▆▆▆▆ 65% │ 5h ▆▆▆▆│▆▆▆▆▆ 74% ↻ 2h52m │ 7d ▆▆▆▆▆▆▆│▆▆ 30% │ $3.12
+#   ctx ━━━━━━━━━━ 65% │ 5h ━━━━│━━━━━ 74% ↻ 2h52m │ 7d ━━━━━━━│━━ 30% │ $3.12
 #
 # Row 1: account chip (the login Claude Code is using, from .claude.json; SHOW_ACCOUNT=0
 #   hides it), model · effort, project folder (· git branch), the ticket or PR you are on,
 #   then the session name, which is shortened or dropped first when the pane is narrow.
-# Row 2: context, 5-hour and 7-day limits, session cost. Bar cells are ¾-height blocks, which
-#   leaves a sliver of space under row 1. Filled cells run green > yellow > orange > red;
+# Row 2: context, 5-hour and 7-day limits, session cost. Bar cells are heavy-line glyphs,
+#   centred on the text in every terminal. Filled cells run green > yellow > orange > red;
 #   the percent is green below 50%, yellow to 79%, red from 80%.
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
@@ -121,8 +121,8 @@ bar() {
       r=$((c[1] + (c[4] - c[1]) * frac / 1000))
       g=$((c[2] + (c[5] - c[2]) * frac / 1000))
       b=$((c[3] + (c[6] - c[3]) * frac / 1000))
-      out+="$(rgb $r $g $b)▆"
-    else out+="${TRACK}▆"; fi
+      out+="$(rgb $r $g $b)━"
+    else out+="${TRACK}━"; fi
   done
   printf '%s' "${out}${RESET} $(level_c $pct)${pct}%${RESET}"
 }

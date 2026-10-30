@@ -2,7 +2,7 @@
 """Render 24-bit ANSI terminal text (stdin) as an SVG terminal snippet (stdout).
 
 Understands the escape codes statusline.sh emits: reset, bold, 38;2 and 48;2 colours.
-Block glyphs and the Nerd Font chip caps are drawn as shapes, so the picture does not
+Block and line glyphs and the Nerd Font chip caps are drawn as shapes, so the picture does not
 depend on the viewer having those fonts.
 
 Usage: ... | python3 tools/ansi2svg.py [--title TEXT] > out.svg
@@ -17,6 +17,8 @@ BG, FG, MUTED = "#282a36", "#f8f8f2", "#6272a4"
 FONT = "'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace"
 SGR = re.compile(r"\x1b\[([0-9;]*)m")
 BLOCKS = {"█": 1.0, "▇": 7 / 8, "▆": 3 / 4, "▅": 5 / 8, "▄": 1 / 2}
+LINE, LINE_W = "━", 3          # heavy line: centred in the cell, 3px thick
+SHAPES = "".join(BLOCKS) + "░" + LINE   # drawn, never set as text
 
 
 def cells(line):
@@ -60,7 +62,7 @@ def render(lines, title):
                    f'font-size="13" text-anchor="middle">{escape(title)}</text>')
     for r, row in enumerate(rows):
         top = BAR + PAD + r * LH - 4
-        base = top + LH * 0.72
+        base = top + LH * 0.75   # puts capitals on the cell's middle, as terminals do
         for c, (ch, fg, bg, bold) in enumerate(row):
             x = PAD + c * CW
             if bg:
@@ -68,6 +70,8 @@ def render(lines, title):
             if ch in BLOCKS:
                 hh = LH * BLOCKS[ch]
                 out.append(f'<rect x="{x:.1f}" y="{top + LH - hh:.1f}" width="{CW + 0.4:.1f}" height="{hh:.1f}" fill="{fg}"/>')
+            elif ch == LINE:
+                out.append(f'<rect x="{x:.1f}" y="{top + (LH - LINE_W) / 2:.1f}" width="{CW + 0.4:.1f}" height="{LINE_W}" fill="{fg}"/>')
             elif ch == "░":
                 out.append(f'<rect x="{x:.1f}" y="{top}" width="{CW + 0.4:.1f}" height="{LH}" fill="{fg}" opacity=".3"/>')
             elif ch == "\ue0b6":   # left half-circle cap
@@ -78,19 +82,19 @@ def render(lines, title):
         c = 0
         while c < len(row):
             ch, fg, bg, bold = row[c]
-            if ch == " " or ch in BLOCKS or ch in "░":
+            if ch == " " or ch in SHAPES:
                 c += 1
                 continue
             e = c
             while e < len(row) and row[e][1:] == row[c][1:] and row[e][0] != " " \
-                    and row[e][0] not in BLOCKS and row[e][0] not in "░":
+                    and row[e][0] not in SHAPES:
                 e += 1
             # let single spaces inside one style join the run (keeps words together)
             while e + 1 < len(row) and row[e][0] == " " and row[e][1:] == row[c][1:] \
-                    and row[e + 1][1:] == row[c][1:] and row[e + 1][0] not in BLOCKS:
+                    and row[e + 1][1:] == row[c][1:] and row[e + 1][0] not in SHAPES:
                 e += 2
                 while e < len(row) and row[e][1:] == row[c][1:] and row[e][0] != " " \
-                        and row[e][0] not in BLOCKS and row[e][0] not in "░":
+                        and row[e][0] not in SHAPES:
                     e += 1
             text = "".join(t[0] for t in row[c:e])
             weight = ' font-weight="bold"' if bold else ""
