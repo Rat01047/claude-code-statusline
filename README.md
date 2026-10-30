@@ -37,7 +37,7 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 - The pink **│** on the 5h and 7d bars is **pace**: how much of that window has already
   passed. Fill ahead of the marker means you are using the limit faster than it refills.
 - **↻ 2h52m** is the time until that limit resets. It only appears once a limit reaches 70%.
-- Bar cells are heavy-line glyphs (━), which sit on the middle of the line, level with the text.
+- Bar cells are ■, which sits on the text baseline like a letter, so the bars line up with the labels and percents.
 
 ![Near the limits](docs/screenshots/limits.svg)
 

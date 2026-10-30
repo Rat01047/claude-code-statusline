@@ -20,8 +20,8 @@ T="$A/tickets/2026-10-28 [#42] Coupon-applies-twice"
 D="$A/tickets/2026-09-30 [#17] Guest-checkout-email-missing - DONE"
 mkdir -p "$T/notes" "$D"
 
-# Plain text for the checks: track cells read as ░ and filled line cells as █, colours removed.
-strip() { sed -e $'s/\x1b\\[38;2;68;71;90m━/░/g' -e 's/━/█/g' -e $'s/\x1b\\[[0-9;]*m//g'; }
+# Plain text for the checks: track cells read as ░ and filled cells as █, colours removed.
+strip() { sed -e $'s/\x1b\\[38;2;68;71;90m■/░/g' -e 's/■/█/g' -e $'s/\x1b\\[[0-9;]*m//g'; }
 pass=0 fail=0
 ok()  { print -r -- "PASS  $1"; ((pass++)); }
 bad() { print -r -- "FAIL  $1"; print -r -- "$2" | sed 's/^/      | /'; ((fail++)); }
@@ -55,11 +55,11 @@ check "chip: configured background and text colour, caps in chip colour" "$R" \
 check "dracula: Opus orange, folder purple, ticket number cyan, title foreground, cost green" "$R" \
   '[[ "$R" == *"38;2;255;184;108m◆ Opus 5.5"* && "$R" == *"38;2;189;147;249mAcme-Shop"* && "$R" == *"38;2;139;233;253m#42"* && "$R" == *"38;2;248;248;242mCoupon applies"* && "$R" == *"38;2;80;250;123m\$3.12"* ]]'
 check "separators comment grey, track current-line grey, pace marker pink" "$R" \
-  '[[ "$R" == *$'"'"'\e[38;2;98;114;164m│'"'"'* && "$R" == *"38;2;68;71;90m━"* && "$R" == *"38;2;255;121;198m│"* ]]'
-check "bars are heavy-line cells, centred on the text; no blocks or shades" "$R" \
-  '[[ "$R" == *━* && "$R" != *▆* && "$R" != *█* && "$R" != *░* ]]'
+  '[[ "$R" == *$'"'"'\e[38;2;98;114;164m│'"'"'* && "$R" == *"38;2;68;71;90m■"* && "$R" == *"38;2;255;121;198m│"* ]]'
+check "bars are ■ cells, sitting on the text baseline; no lines, blocks or shades" "$R" \
+  '[[ "$R" == *■* && "$R" != *━* && "$R" != *▆* && "$R" != *█* && "$R" != *░* ]]'
 check "gradient: ctx bar has 6 different cell colours, first is the dimmed green" "$R" \
-  '(( $(line "$R" 2 | grep -o $'"'"'\e\\[38;2;[0-9;]*m━'"'"' | head -6 | sort -u | wc -l) == 6 )) && [[ "$R" == *"38;2;74;219;113m━"* ]]'
+  '(( $(line "$R" 2 | grep -o $'"'"'\e\\[38;2;[0-9;]*m■'"'"' | head -6 | sort -u | wc -l) == 6 )) && [[ "$R" == *"38;2;74;219;113m■"* ]]'
 check "percent colour: 65% and 74% yellow, 30% green" "$R" \
   '[[ "$R" == *"38;2;241;250;140m65%"* && "$R" == *"38;2;241;250;140m74%"* && "$R" == *"38;2;80;250;123m30%"* ]]'
 

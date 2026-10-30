@@ -21,34 +21,34 @@
 <text x="423.0" y="60.5" fill="#f8f8f2" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="180.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Coupon applies twice</text>
 <text x="612.0" y="60.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
 <text x="630.0" y="60.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="153.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Checkout refactor</text>
-<rect x="54.0" y="75.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="63.0" y="75.5" width="9.4" height="3" fill="#77db75"/>
-<rect x="72.0" y="75.5" width="9.4" height="3" fill="#a5db7a"/>
-<rect x="81.0" y="75.5" width="9.4" height="3" fill="#d3db7f"/>
-<rect x="90.0" y="75.5" width="9.4" height="3" fill="#d6c977"/>
-<rect x="99.0" y="75.5" width="9.4" height="3" fill="#dab66e"/>
-<rect x="108.0" y="75.5" width="9.4" height="3" fill="#dfa364"/>
-<rect x="117.0" y="75.5" width="9.4" height="3" fill="#df885e"/>
-<rect x="126.0" y="75.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="135.0" y="75.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="234.0" y="75.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="243.0" y="75.5" width="9.4" height="3" fill="#77db75"/>
-<rect x="252.0" y="75.5" width="9.4" height="3" fill="#a5db7a"/>
-<rect x="261.0" y="75.5" width="9.4" height="3" fill="#d3db7f"/>
-<rect x="270.0" y="75.5" width="9.4" height="3" fill="#d6c977"/>
-<rect x="279.0" y="75.5" width="9.4" height="3" fill="#dab66e"/>
-<rect x="288.0" y="75.5" width="9.4" height="3" fill="#dfa364"/>
-<rect x="297.0" y="75.5" width="9.4" height="3" fill="#df885e"/>
-<rect x="306.0" y="75.5" width="9.4" height="3" fill="#df6c57"/>
-<rect x="468.0" y="75.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="477.0" y="75.5" width="9.4" height="3" fill="#77db75"/>
-<rect x="486.0" y="75.5" width="9.4" height="3" fill="#a5db7a"/>
-<rect x="495.0" y="75.5" width="9.4" height="3" fill="#d3db7f"/>
-<rect x="504.0" y="75.5" width="9.4" height="3" fill="#d6c977"/>
-<rect x="513.0" y="75.5" width="9.4" height="3" fill="#dab66e"/>
-<rect x="522.0" y="75.5" width="9.4" height="3" fill="#dfa364"/>
-<rect x="540.0" y="75.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="549.0" y="75.5" width="9.4" height="3" fill="#44475a"/>
+<rect x="54.0" y="74.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="63.0" y="74.2" width="9.4" height="8.7" fill="#77db75"/>
+<rect x="72.0" y="74.2" width="9.4" height="8.7" fill="#a5db7a"/>
+<rect x="81.0" y="74.2" width="9.4" height="8.7" fill="#d3db7f"/>
+<rect x="90.0" y="74.2" width="9.4" height="8.7" fill="#d6c977"/>
+<rect x="99.0" y="74.2" width="9.4" height="8.7" fill="#dab66e"/>
+<rect x="108.0" y="74.2" width="9.4" height="8.7" fill="#dfa364"/>
+<rect x="117.0" y="74.2" width="9.4" height="8.7" fill="#df885e"/>
+<rect x="126.0" y="74.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="135.0" y="74.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="234.0" y="74.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="243.0" y="74.2" width="9.4" height="8.7" fill="#77db75"/>
+<rect x="252.0" y="74.2" width="9.4" height="8.7" fill="#a5db7a"/>
+<rect x="261.0" y="74.2" width="9.4" height="8.7" fill="#d3db7f"/>
+<rect x="270.0" y="74.2" width="9.4" height="8.7" fill="#d6c977"/>
+<rect x="279.0" y="74.2" width="9.4" height="8.7" fill="#dab66e"/>
+<rect x="288.0" y="74.2" width="9.4" height="8.7" fill="#dfa364"/>
+<rect x="297.0" y="74.2" width="9.4" height="8.7" fill="#df885e"/>
+<rect x="306.0" y="74.2" width="9.4" height="8.7" fill="#df6c57"/>
+<rect x="468.0" y="74.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="477.0" y="74.2" width="9.4" height="8.7" fill="#77db75"/>
+<rect x="486.0" y="74.2" width="9.4" height="8.7" fill="#a5db7a"/>
+<rect x="495.0" y="74.2" width="9.4" height="8.7" fill="#d3db7f"/>
+<rect x="504.0" y="74.2" width="9.4" height="8.7" fill="#d6c977"/>
+<rect x="513.0" y="74.2" width="9.4" height="8.7" fill="#dab66e"/>
+<rect x="522.0" y="74.2" width="9.4" height="8.7" fill="#dfa364"/>
+<rect x="540.0" y="74.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="549.0" y="74.2" width="9.4" height="8.7" fill="#44475a"/>
 <text x="18.0" y="82.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">ctx</text>
 <text x="153.0" y="82.5" fill="#ff5555" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">88%</text>
 <text x="189.0" y="82.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>

@@ -20,16 +20,16 @@
 <text x="54.0" y="82.5" fill="#f8f8f2" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="180.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Coupon applies twice</text>
 <text x="243.0" y="82.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>
 <text x="261.0" y="82.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="153.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">Checkout refactor</text>
-<rect x="54.0" y="97.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="63.0" y="97.5" width="9.4" height="3" fill="#d3db7f"/>
-<rect x="72.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="81.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="180.0" y="97.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="198.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="207.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="378.0" y="97.5" width="9.4" height="3" fill="#4adb71"/>
-<rect x="387.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
-<rect x="396.0" y="97.5" width="9.4" height="3" fill="#44475a"/>
+<rect x="54.0" y="96.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="63.0" y="96.2" width="9.4" height="8.7" fill="#d3db7f"/>
+<rect x="72.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="81.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="180.0" y="96.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="198.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="207.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="378.0" y="96.2" width="9.4" height="8.7" fill="#4adb71"/>
+<rect x="387.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
+<rect x="396.0" y="96.2" width="9.4" height="8.7" fill="#44475a"/>
 <text x="18.0" y="104.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">ctx</text>
 <text x="99.0" y="104.5" fill="#f1fa8c" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="27.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">65%</text>
 <text x="135.0" y="104.5" fill="#6272a4" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="15" textLength="9.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">│</text>

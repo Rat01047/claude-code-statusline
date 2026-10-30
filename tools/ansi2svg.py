@@ -2,7 +2,7 @@
 """Render 24-bit ANSI terminal text (stdin) as an SVG terminal snippet (stdout).
 
 Understands the escape codes statusline.sh emits: reset, bold, 38;2 and 48;2 colours.
-Block and line glyphs and the Nerd Font chip caps are drawn as shapes, so the picture does not
+Block and square glyphs and the Nerd Font chip caps are drawn as shapes, so the picture does not
 depend on the viewer having those fonts.
 
 Usage: ... | python3 tools/ansi2svg.py [--title TEXT] > out.svg
@@ -17,8 +17,8 @@ BG, FG, MUTED = "#282a36", "#f8f8f2", "#6272a4"
 FONT = "'JetBrains Mono','SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace"
 SGR = re.compile(r"\x1b\[([0-9;]*)m")
 BLOCKS = {"█": 1.0, "▇": 7 / 8, "▆": 3 / 4, "▅": 5 / 8, "▄": 1 / 2}
-LINE, LINE_W = "━", 3          # heavy line: centred in the cell, 3px thick
-SHAPES = "".join(BLOCKS) + "░" + LINE   # drawn, never set as text
+SQUARE, SQ_H = "■", 0.58         # black square: baseline to x-height, full cell wide (in em)
+SHAPES = "".join(BLOCKS) + "░" + SQUARE   # drawn, never set as text
 
 
 def cells(line):
@@ -70,8 +70,8 @@ def render(lines, title):
             if ch in BLOCKS:
                 hh = LH * BLOCKS[ch]
                 out.append(f'<rect x="{x:.1f}" y="{top + LH - hh:.1f}" width="{CW + 0.4:.1f}" height="{hh:.1f}" fill="{fg}"/>')
-            elif ch == LINE:
-                out.append(f'<rect x="{x:.1f}" y="{top + (LH - LINE_W) / 2:.1f}" width="{CW + 0.4:.1f}" height="{LINE_W}" fill="{fg}"/>')
+            elif ch == SQUARE:
+                out.append(f'<rect x="{x:.1f}" y="{base + 0.03 * FS - SQ_H * FS:.1f}" width="{CW + 0.4:.1f}" height="{SQ_H * FS:.1f}" fill="{fg}"/>')
             elif ch == "░":
                 out.append(f'<rect x="{x:.1f}" y="{top}" width="{CW + 0.4:.1f}" height="{LH}" fill="{fg}" opacity=".3"/>')
             elif ch == "\ue0b6":   # left half-circle cap
