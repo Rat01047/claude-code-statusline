@@ -30,7 +30,7 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 | PR | From a branch named like `pr/123`, `fix/pr-123` or `feature-pr123`. The title is fetched with `gh pr view` in the background and cached for an hour, so the line never waits on the network. |
 | Session name | Set with `/rename`, or `CLAUDE_TASK=...`. It is shortened, or dropped, before anything else when the pane is narrow. |
 
-**Row 2**: CTX (context window) │ 5h │ 7d │ cost
+**Row 2**: ctx (context window) │ 5h │ 7d │ cost
 
 - Bars fill green → yellow → orange → red along the track. The percent is green below 50%,
   yellow to 79%, red from 80%.

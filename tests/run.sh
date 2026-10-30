@@ -46,8 +46,8 @@ R=$(run "$(mk "$T/notes" "$A" 65 74 30)" 157); P=$(print -r -- "$R" | strip)
 check "wide: 2 lines" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
 check "row 1: chip, model · effort, product folder, ticket, session name" "$P" \
   '[[ "$(line "$P" 1)" == "${CAPL}Work${CAPR} │ ◆ Opus 5.5 · high │ Acme-Shop │ #42 Coupon applies twice │ Checkout refactor" ]]'
-check "row 2: CTX, 5h with pace and reset, 7d with pace, cost" "$P" \
-  '[[ "$(line "$P" 2)" == "CTX ██████░░░░ 65% │ 5h ████│██░░░ 74% ↻ 2h52m │ 7d ███░░░░│░░ 30% │ \$3.12" ]]'
+check "row 2: ctx, 5h with pace and reset, 7d with pace, cost" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx ██████░░░░ 65% │ 5h ████│██░░░ 74% ↻ 2h52m │ 7d ███░░░░│░░ 30% │ \$3.12" ]]'
 check "exactly one bold run (the chip)" "$R" '(( $(print -r -- "$R" | grep -o $'"'"'\e\\[1m'"'"' | wc -l) == 1 ))'
 check "no emoji" "$P" '! print -r -- "$P" | LC_ALL=C grep -q $'"'"'\xf0\x9f'"'"''
 check "chip: configured background and text colour, caps in chip colour" "$R" \
@@ -70,9 +70,9 @@ check "all limits under 70%: no reset time" "$R" '[[ "$R" != *"↻"* ]]'
 
 # 2b. Context label: window size other than 200k, and the over-200k warning.
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
-check "1M window: label reads CTX 1M" "$P" '[[ "$(line "$P" 2)" == "CTX 1M "* ]]'
+check "1M window: label reads ctx 1M" "$P" '[[ "$(line "$P" 2)" == "ctx 1M "* ]]'
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.exceeds_200k_tokens = true')" 157)
-check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mCTX >200k"* ]]'
+check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mctx >200k"* ]]'
 
 # 3. Project root: no ticket. Tab opened in the home folder: folder comes from the working folder.
 P=$(run "$(mk "$A" "$A" 40 30 20)" 157 | strip)

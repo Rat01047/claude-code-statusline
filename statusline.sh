@@ -5,7 +5,7 @@
 # Requires: zsh, jq. Optional: gh (PR titles), a Nerd Font (rounded account chip).
 #
 #   Work │ ◆ Opus 5.5 · high │ Acme-Shop │ #42 Coupon applies twice │ Checkout refactor
-#   CTX ■■■■■■■■■■ 65% │ 5h ■■■■│■■■■■ 74% ↻ 2h52m │ 7d ■■■■■■■│■■ 30% │ $3.12
+#   ctx ■■■■■■■■■■ 65% │ 5h ■■■■│■■■■■ 74% ↻ 2h52m │ 7d ■■■■■■■│■■ 30% │ $3.12
 #
 # Row 1: account chip (the login Claude Code is using, from .claude.json; SHOW_ACCOUNT=0
 #   hides it), model · effort, project folder (· git branch), the ticket or PR you are on,
@@ -15,7 +15,7 @@
 #   the percent is green below 50%, yellow to 79%, red from 80%.
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
-#   limit at 70% or more. "CTX 1M" names a context window that is not 200k.
+#   limit at 70% or more. "ctx 1M" names a context window that is not 200k.
 #
 # Settings: ${CLAUDE_STATUSLINE_CONF:-~/.config/claude-statusline/config.zsh}, see
 # config.example.zsh. Everything works without it.
@@ -324,7 +324,7 @@ limit_part() {   # $1 label  $2 percent  $3 resets_at  $4 pace
 limit_parts() {
   parts=()
   if [[ -n "$CTX" ]]; then
-    local size="$(to_int "$CTX_SIZE")" label="CTX"
+    local size="$(to_int "$CTX_SIZE")" label="ctx"
     ((size > 0 && size != 200000)) && label+=" $(tokens $size)"
     if [[ "$BIG" == "true" ]]; then label="${RED}${label} >200k${RESET}"
     else label="${MUTED}${label}${RESET}"; fi
