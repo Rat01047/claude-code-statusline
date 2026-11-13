@@ -87,6 +87,26 @@ check "home as project, inside a ticket: folder = the project above tickets/" "$
 P=$(run "$(mk "$D" "$A" 40 30 20)" 157 | strip)
 check "done ticket shows (done)" "$P" '[[ "$P" == *"#17 Guest checkout email missing (done)"* ]]'
 
+# 4b. Tab at the project root: the ticket comes from the folder this session claimed.
+K=$W/claims; mkdir -p $K
+print -r -- '{"session_id":"sess-other","folder":"'"$D"'","claimed_at":"2026-10-28T09:00:00"}' >$K/a.json
+print -r -- '{"session_id":"sess-1","folder":"'"$D"'","claimed_at":"2026-10-28T10:00:00"}' >$K/b.json
+print -r -- '{"session_id":"sess-1","folder":"'"$T"'","claimed_at":"2026-10-28T11:00:00"}' >$K/c.json
+print -r -- 'TICKET_CLAIMS='$K | cat $FX/config.zsh - >$W/claims.zsh
+claimed() { print -r -- "$(mk "$1" "$A" 40 30 20)" | jq --arg s "$2" '.session_id=$s' | CLAUDE_STATUSLINE_CONF=$W/claims.zsh COLUMNS=157 "$F" | strip; }
+P=$(claimed "$A" sess-1)
+check "claim: project root shows this session's newest claimed ticket" "$P" \
+  '[[ "$(line "$P" 1)" == *"│ Acme-Shop │ #42 Coupon applies twice │ Checkout refactor" ]]'
+P=$(claimed "$A" sess-none)
+check "claim: a session with no claim shows no ticket" "$P" '[[ "$(line "$P" 1)" == *"│ Acme-Shop │ Checkout refactor" ]]'
+P=$(claimed "$D" sess-1)
+check "claim: the working folder wins when it is inside a ticket" "$P" '[[ "$P" == *"#17 Guest checkout email missing (done)"* ]]'
+print -r -- '{broken' >$K/d.json
+P=$(claimed "$A" sess-1)
+check "claim: an unreadable claim file is skipped" "$P" '[[ "$P" == *"│ #42 Coupon applies twice │"* ]]'
+P=$(print -r -- "$(mk "$A" "$A" 40 30 20)" | jq '.session_id="sess-1"' | COLUMNS=157 "$F" | strip)
+check "claim: TICKET_CLAIMS unset, no ticket at the project root" "$P" '[[ "$(line "$P" 1)" == *"│ Acme-Shop │ Checkout refactor" ]]'
+
 # 5. Every row fits at every width, in at most 3 lines.
 for c in 60 72 75 100 157; do
   P=$(run "$(mk "$T/notes" "$A" 65 74 30)" $c | strip)

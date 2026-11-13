@@ -32,6 +32,7 @@ SHOW_ACCOUNT=1                    # 0 = no account chip (and .claude.json is nev
 ACCOUNTS=()                       # "email|Label|bg r;g;b|fg r;g;b", one entry per login
 PILL=0                            # 1 = rounded chip ends (needs a Nerd Font)
 TICKET_PATTERN=''                 # regex; match[1] = the ticket folder name. '' = off
+TICKET_CLAIMS=''                  # folder of *.json claims ({session_id, folder}); '' = off
 TICKET_MAX=40                     # longest ticket title shown
 PR_TITLES=1                       # 0 = never call gh
 CONF="${CLAUDE_STATUSLINE_CONF:-${XDG_CONFIG_HOME:-$HOME/.config}/claude-statusline/config.zsh}"
@@ -66,7 +67,7 @@ command -v jq >/dev/null 2>&1 || { echo "statusline: jq not found"; exit 0; }
 
 # One jq call; fields joined by U+001F so empty values survive `read`.
 IFS=$'\x1f' read -r MODEL EFFORT SESSION DIR PROJ CTX CTX_SIZE BIG R5 R5_AT R7 R7_AT COST \
-  STYLE VIM AGENT PR_NUM PR_STATE <<<"$(jq -r '[
+  STYLE VIM AGENT PR_NUM PR_STATE SID <<<"$(jq -r '[
   (.model.display_name // ""),
   (.effort.level // ""),
   (.session_name // ""),
@@ -84,7 +85,8 @@ IFS=$'\x1f' read -r MODEL EFFORT SESSION DIR PROJ CTX CTX_SIZE BIG R5 R5_AT R7 R
   (.vim.mode // ""),
   (.agent.name // ""),
   (.pr.number // ""),
-  (.pr.review_state // "")
+  (.pr.review_state // ""),
+  (.session_id // "")
 ] | map(tostring) | join("\u001f")' <<<"$input_json" 2>/dev/null)"
 
 # Names are printed to the terminal: drop control characters so a folder, model or ticket
@@ -266,7 +268,19 @@ fi
 # "[#123] Title-words", "Title-words-PR123" and "Title-words-123".
 tmax=$TICKET_MAX; ((tmax > MAXW - 20)) && tmax=$((MAXW - 20))
 ITEM="" PR_SHOWN=""
-if [[ -n "$TICKET_PATTERN" && "$DIR" =~ $TICKET_PATTERN ]]; then
+# A tab that stays at the project root is in no ticket folder. With TICKET_CLAIMS set, the
+# ticket is then the folder this session claimed: the newest claim file naming its id.
+TDIR="$DIR"
+if [[ -n "$TICKET_PATTERN" && -n "$TICKET_CLAIMS" && "$SID" == [[:alnum:]-]## && ! "$DIR" =~ $TICKET_PATTERN ]]; then
+  claims=("$TICKET_CLAIMS"/*.json(N.))
+  ((${#claims})) && claims=(${(f)"$(grep -lF -- "$SID" "${claims[@]}" 2>/dev/null)"})
+  for c in "${claims[@]}"; do
+    jq -r --arg s "$SID" 'select(.session_id == $s and (.folder | type) == "string")
+      | "\(.claimed_at // "")\u001f\(.folder)"' "$c" 2>/dev/null
+  done | sort | tail -1 | IFS=$'\x1f' read -r _ c
+  [[ -n "$c" ]] && TDIR="$c"
+fi
+if [[ -n "$TICKET_PATTERN" && "$TDIR" =~ $TICKET_PATTERN ]]; then
   tk="${${match[1]//[[:cntrl:]]/}#<->. }" tnum="" tdone=""
   tk="${tk#<->-<->-<-> }"; tk="${tk#- }"
   [[ "$tk" == *" - DONE" ]] && tdone=1 tk="${tk% - DONE}"

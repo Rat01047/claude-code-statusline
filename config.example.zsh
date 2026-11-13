@@ -21,6 +21,10 @@ PILL=1
 # This one matches ".../my-project/tickets/2026-10-28 [#42] Coupon-applies-twice" and shows
 # "#42 Coupon applies twice". A folder name ending in " - DONE" adds "(done)".
 # TICKET_PATTERN='/tickets/([^/]+)'
+# If your tabs stay at the project root, the working folder never names a ticket. Point this
+# at a folder of *.json files, each {"session_id": "...", "folder": "...", "claimed_at": "..."},
+# written by your own tooling; the ticket is then the folder the session claimed.
+# TICKET_CLAIMS="$HOME/.claude/ticket-claims"
 TICKET_MAX=40
 
 # PR title from `gh pr view` (run in the background, cached for an hour). 0 = never call gh.

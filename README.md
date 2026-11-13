@@ -101,6 +101,7 @@ cp claude-code-statusline/config.example.zsh ~/.config/claude-statusline/config.
 | `ACCOUNTS` | none | `'email\|Label\|bg r;g;b\|text r;g;b'`, one per login. |
 | `PILL` | `0` | `1` gives the chip rounded ends (needs a Nerd Font). |
 | `TICKET_PATTERN` | `''` (off) | Regex for your ticket folders; the first group is the folder's name. The example config has `'/tickets/([^/]+)'`. |
+| `TICKET_CLAIMS` | `''` (off) | Folder of `*.json` files, each `{"session_id": "…", "folder": "…", "claimed_at": "…"}`. When the working folder is not inside a ticket, the ticket is the folder the session claimed (newest `claimed_at` wins). For tabs that stay at the project root. |
 | `TICKET_MAX` | `40` | Longest ticket title shown. |
 | `PR_TITLES` | `1` | `0` never calls `gh`. |
 
