@@ -45,3 +45,27 @@ for i in {1..30}; do [[ -n "$(cat $TMPDIR/claude-statusline-$UID/pr-*(N) 2>/dev/
 shot pr 112 "On a PR branch" "$J" PATH=$W/bin:$PATH
 
 shot narrow 60 "A narrow pane (60 columns)" "$(mk "$T/notes" 65 74 30 10320 "Checkout refactor")"
+
+# Progress row: a made-up task list and running helpers in a scratch config folder, with the
+# usual advisor time (7m) already in the estimate cache.
+P=$W/cfg; mkdir -p $P/tasks/s-1 $P/projects/acme/s-1/subagents $P/projects/acme/s-2/subagents
+cp $FX/work/.claude.json $P/
+i=0; for t in "Read the spec" "Map the checkout code" "Write coupon tests" "Fix double discount" \
+  "Fix bundle rounding" "Run the suite" "Review the diff" "Update the changelog" "Open the PR"; do
+  ((i++)); s=pending; ((i <= 6)) && s=completed; ((i == 7)) && s=in_progress
+  printf '{"id":"%s","subject":"%s","status":"%s"}' $i "$t" $s >$P/tasks/s-1/$i.json
+done
+zmodload zsh/datetime
+helper() {  # $1 session  $2 id  $3 type  $4 seconds running
+  printf '{"agentType":"%s","description":"Second opinion"}' $3 >$P/projects/acme/$1/subagents/agent-$2.meta.json
+  print -r -- "{\"timestamp\":\"$(TZ=UTC strftime '%Y-%m-%dT%H:%M:%S.000Z' $((now - $4)))\"}" >$P/projects/acme/$1/subagents/agent-$2.jsonl
+}
+helper s-1 a1 advisor 192
+helper s-2 a2 advisor 540; helper s-2 a3 advisor 680
+C=$TMPDIR/claude-statusline-$UID; mkdir -p -m 700 $C
+print 420 >$C/est-$(print -rn -- advisor | cksum | cut -d' ' -f1)
+sid() { jq --arg s $1 '. + {session_id: $s}'; }
+shot progress 112 "Progress row: Claude's task list and a running advisor, on track" \
+  "$(mk "$T/notes" 41 38 30 10320 "Checkout refactor" | sid s-1)" CLAUDE_CONFIG_DIR=$P
+shot progress-over 112 "An advisor past its usual time, with a second one running" \
+  "$(mk "$T/notes" 58 52 33 10320 "Checkout refactor" | sid s-2)" CLAUDE_CONFIG_DIR=$P

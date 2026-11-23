@@ -222,5 +222,99 @@ check "config writable by others: not loaded (no chip colours)" "$(print -r -- "
 C=$TMPDIR/claude-statusline-$UID
 check "cache folder is $C:t, mode 700" "$(ls -ld $C 2>&1)" '[[ -d $C && $(stat -f %Lp $C 2>/dev/null || stat -c %a $C) == 700 ]]'
 
+# 12. Progress row: Claude's task list for this session, read from <config>/tasks/<session_id>.
+CFG=$W/cfg; mkdir -p $CFG; cp $FX/work/.claude.json $CFG/
+TK=$CFG/tasks/s-1; mkdir -p $TK
+# Pretty-printed with no newline at the end, as Claude Code writes them.
+task() { printf '%s' "$(jq -n --arg i $1 --arg s "$2" --arg t "$3" '{id:$i, subject:$t, status:$s}')" >$TK/$1.json; }  # id status subject
+for i in 1 2 3 4 5 6; do task $i completed "Done step $i"; done
+task 7 in_progress "Review the diff"; task 8 pending "Later"; task 9 pending "Later still"
+task 10 deleted "Dropped"; print -r -- '{not json' >$TK/11.json
+mks() { mk "$A" "$A" 40 30 20 | jq --arg s "${1:-s-1}" '. + {session_id:$s}'; }
+runp() { print -r -- "$1" | CLAUDE_CONFIG_DIR=$CFG COLUMNS=${2:-157} "$F"; }
+P=$(runp "$(mks)" | strip)
+check "tasks: third row counts done of total, skips unknown status and bad files, names the task in progress" "$P" \
+  '(( $(print -r -- "$P" | wc -l) == 3 )) && [[ "$(line "$P" 3)" == "tasks ██████░░░░ 6/9 · Review the diff" ]]'
+P=$(runp "$(mks s-2)" | strip)
+check "tasks: no task list for this session, no third row" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+P=$(runp "$(mks ../tasks/s-1)" | strip)
+check "tasks: a session id with a path in it reads nothing, even one that leads to a task list" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+print -r -- "source $FX/config.zsh; SHOW_PROGRESS=0" >$W/noprog.zsh
+P=$(print -r -- "$(mks)" | CLAUDE_CONFIG_DIR=$CFG CLAUDE_STATUSLINE_CONF=$W/noprog.zsh COLUMNS=157 "$F" | strip)
+check "SHOW_PROGRESS=0: no third row" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+task 7 in_progress "Evil${ESC}]0;pwned${BEL}task"
+R=$(runp "$(mks)"); NOSGR=$(print -r -- "$R" | sed $'s/\x1b\\[[0-9;]*m//g' | tr -d '\n')
+check "tasks: escape codes in a task subject print as text" "$(print -r -- "$R" | cat -v)" \
+  '[[ "$NOSGR" != *[[:cntrl:]]* && "$(print -r -- "$R" | strip)" == *"· Evil]0;pwnedtask"* ]]'
+task 7 completed "Review the diff"; task 8 completed "Later"; task 9 completed "Later still"
+P=$(runp "$(mks)" | strip)
+check "tasks: all completed, no third row" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+task 7 in_progress "Review the diff"; task 8 pending "Later"; task 9 pending "Later still"
+
+# 13. Progress row: helper agents still running in this session, from
+# <config>/projects/<project>/<session_id>/subagents/agent-<id>.meta.json and its transcript.
+# The estimate is the median of past finished runs of the same type, made in the background.
+zmodload zsh/datetime
+iso() { TZ=UTC strftime '%Y-%m-%dT%H:%M:%S.000Z' $1; }
+agent() {  # $1 session  $2 id  $3 type  $4 start epoch  $5 1 = finished  [$6 end epoch]
+  local d=$CFG/projects/-x-Acme-Shop/$1/subagents; mkdir -p $d
+  printf '%s' "$(jq -cn --arg t "$3" --argjson f $5 '{agentType:$t, description:"Rate the v8 package"}
+    + (if $f == 1 then {finished:true} else {} end)')" >$d/agent-$2.meta.json   # no newline at the end
+  print -r -- "{\"type\":\"user\",\"timestamp\":\"$(iso $4)\"}"$'\n'"{\"type\":\"assistant\",\"timestamp\":\"$(iso ${6:-$4})\"}" >$d/agent-$2.jsonl
+}
+waitest() { local i; for i in {1..50}; do [[ -n "$(cat $C/est-*(N) 2>/dev/null)" && -z "$(find $C -name 'est-*' -empty)" ]] && break; sleep 0.1; done; }
+n=$(date +%s)
+agent h-1 h1 advisor $((n - 9000)) 1 $((n - 8640)); agent h-1 h2 advisor $((n - 8000)) 1 $((n - 7580))
+agent h-1 h3 advisor $((n - 7000)) 1 $((n - 6520)); agent h-1 h4 advisor $((n - 900000)) 1 $((n - 4))
+agent h-1 h5 general-purpose $((n - 5000)) 1 $((n - 4900)); agent h-1 h6 general-purpose $((n - 4000)) 1 $((n - 3900))
+print -r -- '{not json' >$CFG/projects/-x-Acme-Shop/h-1/subagents/agent-h7.meta.json
+rm -f $C/est-*(N)
+n=$(date +%s); agent s-1 r1 advisor $((n - 192)) 0
+P=$(runp "$(mks)" | strip)
+check "helper: before the estimate exists, the running time only" "$P" \
+  '[[ "$(line "$P" 3)" == "tasks ██████░░░░ 6/9 · Review the diff │ ⧗ advisor 3m1"[23]"s" ]]'
+waitest
+P=$(runp "$(mks)" | strip)
+check "helper: estimated bar against the median of past runs, outlier left out" "$P" \
+  '[[ "$(line "$P" 3)" == "tasks ██████░░░░ 6/9 · Review the diff │ ⧗ advisor ████░░░░░░ ~45% 3m1"[23]"s of ~7m" ]]'
+n=$(date +%s); agent s-1 r1 advisor $((n - 540)) 0
+R=$(runp "$(mks)"); P=$(print -r -- "$R" | strip)
+check "helper: over the estimate, the bar is full and orange" "$P" \
+  '[[ "$R" == *"$(repeat 10 printf "\e[38;2;255;184;108m■")"* && "$(line "$P" 3)" == *"⧗ advisor ██████████ 9m0"[01]"s of ~7m" ]]'
+P=$(print -r -- "$(mks)" | CLAUDE_CONFIG_DIR=$CFG CLAUDE_STATUSLINE_CONF=$W/noprog.zsh COLUMNS=157 "$F" | strip)
+check "SHOW_PROGRESS=0: no helper either" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+P=$(runp "$(mks)" 60 | strip); wide=0
+for l in "${(@f)P}"; do ((${(m)#l} > 58)) && wide=1; done
+check "helper: a 60-column pane keeps every line within 58 columns" "$P" '((wide == 0 && $(print -r -- "$P" | wc -l) >= 3))'
+rm -rf $CFG/projects/-x-Acme-Shop/s-1
+
+n=$(date +%s); agent s-3 g1 general-purpose $((n - 192)) 0
+runp "$(mks s-3)" >/dev/null; waitest
+P=$(runp "$(mks s-3)" | strip)
+check "helper: under 3 past runs of its type, no bar, the running time only" "$P" \
+  '[[ "$(line "$P" 3)" == "⧗ general-purpose 3m1"[23]"s" ]]'
+rm -rf $CFG/projects/-x-Acme-Shop/s-3
+
+n=$(date +%s); agent s-3 f1 advisor $((n - 300)) 1 $((n - 10))
+P=$(runp "$(mks s-3)" | strip)
+check "helper: a finished helper is not shown" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+agent s-3 st1 advisor $((n - 4000)) 0
+touch -t $(strftime '%Y%m%d%H%M' $((n - 3600))) $CFG/projects/-x-Acme-Shop/s-3/subagents/agent-st1.jsonl
+P=$(runp "$(mks s-3)" | strip)
+check "helper: one silent for 30 minutes is not shown" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+
+n=$(date +%s); agent s-4 a1 advisor $((n - 192)) 0; agent s-4 a2 advisor $((n - 60)) 0
+P=$(runp "$(mks s-4)" | strip)
+check "helper: two running, the newest shown, then +1" "$P" \
+  '[[ "$(line "$P" 3)" == "⧗ advisor █░░░░░░░░░ ~14% 1m0"[01]"s of ~7m +1" ]]'
+P=$(runp "$(mks ../-x-Acme-Shop/s-4)" | strip)
+check "helper: a session id with a path in it reads nothing, even one that leads to running helpers" "$P" \
+  '(( $(print -r -- "$P" | wc -l) == 2 ))'
+
+agent s-5 z1 advisor $((n + 600)) 0
+P=$(runp "$(mks s-5)" | strip)
+check "helper: a start time in the future counts as just started" "$P" \
+  '[[ "$(line "$P" 3)" == "⧗ advisor ░░░░░░░░░░ ~0% 0s of ~7m" ]]'
+
 print -r -- "---- $pass passed, $fail failed"
 ((fail == 0))

@@ -1,6 +1,6 @@
 # claude-code-statusline
 
-**Are you using your Claude limits faster than they refill?** This two-row status line for
+**Are you using your Claude limits faster than they refill?** This status line for
 [Claude Code](https://docs.claude.com/en/docs/claude-code) answers that at a glance. The 5-hour
 and 7-day usage bars each carry a pink pace marker, showing how much of the window has passed.
 When the fill runs ahead of the marker, you are on track to hit the limit before it resets.
@@ -11,7 +11,9 @@ It also shows:
 - **which model and effort level** is running;
 - **which project and PR** you are on, read from your folder and branch names (and, if you
   opt in, which ticket);
-- **how full the context window is**, and what the session has cost so far.
+- **how full the context window is**, and what the session has cost so far;
+- **how far along the current work is**: Claude's task list, and any helper agent (such as
+  an advisor) still running, with an estimate of how long it usually takes.
 
 ![Inside a ticket folder, with TICKET_PATTERN set](docs/screenshots/wide.svg)
 
@@ -45,7 +47,25 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 
 ![On a PR branch](docs/screenshots/pr.svg)
 
-In a narrow pane the line wraps by whole parts and the bars shrink, never past three lines:
+**Row 3**, only while something is in progress: tasks │ running helper
+
+![Progress row: Claude's task list and a running advisor, on track](docs/screenshots/progress.svg)
+
+- **tasks 6/9** is Claude's task list for this session (from `~/.claude/tasks/<session>/`): done
+  of total, then the task in progress. It disappears once every task is done.
+- **⧗ advisor** is a helper agent this session started that has not finished yet (from
+  `~/.claude/projects/…/<session>/subagents/`). The bar is an **estimate**, always marked `~`:
+  it fills against the middle time of that kind of helper's past runs on this machine
+  (worked out in the background, once an hour). Past the usual time it turns orange and full,
+  e.g. `9m00s of ~7m`. With fewer than 3 past runs there is no bar, just the time so far.
+  With several running, the newest is shown, then `+2` for the rest. A helper silent for 30
+  minutes is taken as crashed and hidden.
+- Set `"refreshInterval": 5` in the `statusLine` block (below) so this row keeps counting while
+  the main session waits on a helper. Without it the line only redraws when something happens.
+
+![An advisor past its usual time, with a second one running](docs/screenshots/progress-over.svg)
+
+In a narrow pane each row wraps by whole parts and the bars shrink:
 
 ![A narrow pane](docs/screenshots/narrow.svg)
 
@@ -78,7 +98,8 @@ settings, add the block next to them; don't replace the file:
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
-    "padding": 0
+    "padding": 0,
+    "refreshInterval": 5
   }
 }
 ```
@@ -104,6 +125,7 @@ cp claude-code-statusline/config.example.zsh ~/.config/claude-statusline/config.
 | `TICKET_CLAIMS` | `''` (off) | Folder of `*.json` files, each `{"session_id": "…", "folder": "…", "claimed_at": "…"}`. When the working folder is not inside a ticket, the ticket is the folder the session claimed (newest `claimed_at` wins). For tabs that stay at the project root. |
 | `TICKET_MAX` | `40` | Longest ticket title shown. |
 | `PR_TITLES` | `1` | `0` never calls `gh`. |
+| `SHOW_PROGRESS` | `1` | `0` hides row 3 and never reads the task or helper files. |
 
 Set `CLAUDE_STATUSLINE_CONF` to keep the file somewhere else. The file runs as zsh code, so
 it is skipped unless you own it and it is not world-writable.

@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# claude-code-statusline: a two-row status line for Claude Code.
+# claude-code-statusline: a two-row status line for Claude Code, plus a progress row.
 # Dracula colours, gradient usage bars with a pace marker, an account chip, and the PR (or,
 # if you opt in, the ticket) you are working on, read from your branch and folder names.
 # Requires: zsh, jq. Optional: gh (PR titles), a Nerd Font (rounded account chip).
@@ -16,6 +16,10 @@
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
 #   limit at 70% or more. "ctx 1M" names a context window that is not 200k.
+# Row 3, only while something is in progress: Claude's task list (done of total, the task in
+#   progress) and the newest helper agent still running, with a bar estimated from that
+#   type's past runs, marked ~. SHOW_PROGRESS=0 hides it.
+#   tasks ■■■■■■□□□□ 6/9 · Review the diff │ ⧗ advisor ■■■■□□□□□□ ~45% 3m12s of ~7m
 #
 # Settings: ${CLAUDE_STATUSLINE_CONF:-~/.config/claude-statusline/config.zsh}, see
 # config.example.zsh. Everything works without it.
@@ -35,6 +39,7 @@ TICKET_PATTERN=''                 # regex; match[1] = the ticket folder name. ''
 TICKET_CLAIMS=''                  # folder of *.json claims ({session_id, folder}); '' = off
 TICKET_MAX=40                     # longest ticket title shown
 PR_TITLES=1                       # 0 = never call gh
+SHOW_PROGRESS=1                   # 0 = no progress row (task list, running helpers)
 CONF="${CLAUDE_STATUSLINE_CONF:-${XDG_CONFIG_HOME:-$HOME/.config}/claude-statusline/config.zsh}"
 # Loaded only if it is yours and not world-writable: it runs as zsh code.
 [[ -r "$CONF" && -O "$CONF" ]] && (( ($(zstat +mode "$CONF" 2>/dev/null || print 2) & 8#002) == 0 )) && source "$CONF"
@@ -105,10 +110,11 @@ level_c() {
   else                    print -r -- "$GREEN"; fi
 }
 
-# Bar: BAR_W cells. Filled cells take their colour from their place on the ramp, empty
-# cells are a dim track, and $2 (0-100, optional) puts a pink │ pace marker in its cell.
+# Bar cells: BAR_W of them. Filled cells take their colour from their place on the ramp
+# (or $3, one colour for all), empty cells are a dim track, and $2 (0-100, optional) puts a
+# pink │ pace marker in its cell.
 BAR_W=10
-bar() {
+cells() {
   local pct w=$BAR_W filled mark=-1 i pos seg frac r g b out="" c
   pct="$(to_int "$1")"
   ((pct > 100)) && pct=100
@@ -116,6 +122,7 @@ bar() {
   if [[ -n "$2" ]]; then mark=$(($2 * w / 100)); ((mark >= w)) && mark=$((w - 1)); fi
   for ((i = 0; i < w; i++)); do
     if ((i == mark)); then out+="${PINK}│"
+    elif ((i < filled)) && [[ -n "$3" ]]; then out+="${3}■"
     elif ((i < filled)); then
       pos=$((i * 3000 / (w - 1))) seg=$((pos / 1000)) frac=$((pos % 1000))
       ((seg >= 3)) && seg=2 frac=1000
@@ -126,7 +133,13 @@ bar() {
       out+="$(rgb $r $g $b)■"
     else out+="${TRACK}■"; fi
   done
-  printf '%s' "${out}${RESET} $(level_c $pct)${pct}%${RESET}"
+  printf '%s' "${out}${RESET}"
+}
+# Bar: the cells, then the percent in its level colour.
+bar() {
+  local pct="$(to_int "$1")"
+  ((pct > 100)) && pct=100
+  printf '%s' "$(cells "$pct" "$2") $(level_c $pct)${pct}%${RESET}"
 }
 
 # Pace: percent of the limit window already passed. $1 resets_at, $2 window seconds.
@@ -349,9 +362,9 @@ limit_parts() {
   [[ -n "$COST_PART" ]] && parts+=("$COST_PART")
 }
 # Widest bars that fit one row; at 4 cells, drop the cost, then wrap.
-fits() { (($(vis_width "${(pj:$SEP:)parts}") <= MAXW)); }
-for BAR_W in 10 8 6 4; do limit_parts; fits && break; done
-[[ -n "$COST_PART" ]] && ! fits && parts[-1]=()
+fits() { (($(vis_width "${(pj:$SEP:)@}") <= MAXW)); }
+for BAR_W in 10 8 6 4; do limit_parts; fits "${parts[@]}" && break; done
+[[ -n "$COST_PART" ]] && ! fits "${parts[@]}" && parts[-1]=()
 
 # Session name: it joins the last line of row 1 only, shortened to the room left, and is
 # dropped rather than starting a line of its own. /rename <name>, or CLAUDE_TASK=<name>.
@@ -365,6 +378,125 @@ if [[ -n "$TASK" ]]; then
     if ((${#rows})); then rows[-1]+="${SEP}${MUTED}${TASK}${RESET}"; else rows=("${MUTED}${TASK}${RESET}"); fi
   fi
 fi
+# --- Row 3: progress, shown only while something is in progress ---
+# Claude's task list for this session: done of total, and the task in progress. Read from
+# <config>/tasks/<session_id>/*.json, one jq call; a file that is not JSON is skipped.
+CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+# One line per JSON file, "path<TAB>json", for one jq -R call. Claude Code's files have no
+# newline at the end, and jq reads its files as one stream, so they are joined here instead.
+# JSON never holds a raw newline inside a string, so turning newlines into spaces is safe.
+json_lines() { local f; for f; do print -r -- "$f"$'\t'"${$(<"$f")//$'\n'/ }"; done 2>/dev/null; }
+TASKS_DONE=0 TASKS_ALL=0 TASK_NOW=""
+if ((SHOW_PROGRESS)) && [[ "$SID" == [[:alnum:]-]## ]]; then
+  tfiles=("$CLAUDE_DIR/tasks/$SID"/*.json(N.))
+  ((${#tfiles})) && IFS=$'\x1f' read -r TASKS_DONE TASKS_ALL TASK_NOW <<<"$(json_lines "${tfiles[@]}" | jq -nrR '
+    [inputs | .[index("\t") + 1:] | fromjson? | objects
+      | select(.status | IN("pending", "in_progress", "completed"))]
+    | [(map(select(.status == "completed")) | length), length,
+       (map(select(.status == "in_progress"))[0].subject // "" | tostring)]
+    | map(tostring) | join("\u001f")' 2>/dev/null)"
+  TASKS_DONE=$(to_int "$TASKS_DONE") TASKS_ALL=$(to_int "$TASKS_ALL")
+  ((TASKS_DONE >= TASKS_ALL)) && TASKS_ALL=0   # all done: nothing in progress
+  TASK_NOW="${TASK_NOW//[[:cntrl:]]/}"
+  ((${#TASK_NOW} > 30)) && TASK_NOW="${TASK_NOW[1,29]}…"
+fi
+
+# Helper agents still running in this session: <config>/projects/*/<session_id>/subagents/
+# agent-<id>.meta.json has no "finished": true yet. The newest is shown, then +N for the rest.
+# One whose transcript has been silent for 30 minutes is taken as crashed and not shown.
+# Start time: the first timestamp in its transcript (ISO, UTC).
+first_ts() {
+  head -n 5 -- "$1" 2>/dev/null | jq -nrR 'first(inputs | fromjson? | .timestamp? | strings
+    | (sub("\\.[0-9]+Z$"; "Z") | fromdate)?) | floor' 2>/dev/null
+}
+HELPER_START=0 HELPER_TYPE="" HELPER_MORE=0 HELPER_EST=0
+if ((SHOW_PROGRESS)) && [[ "$SID" == [[:alnum:]-]## ]]; then
+  metas=("$CLAUDE_DIR"/projects/*/"$SID"/subagents/agent-*.meta.json(N.))
+  helpers=()
+  ((${#metas})) && for m in ${(f)"$(json_lines "${metas[@]}" | jq -nrR 'inputs | index("\t") as $i
+      | (.[$i + 1:] | fromjson? // null) as $o
+      | select(($o | type) == "object" and $o.finished != true)
+      | [.[:$i], ($o.agentType // "agent" | tostring)] | join("\u001f")' 2>/dev/null)"}; do
+    IFS=$'\x1f' read -r mf mt <<<"$m"
+    tr="${mf%.meta.json}.jsonl"
+    [[ -f "$tr" ]] && (($(age "$tr") <= 1800)) || continue
+    st="$(first_ts "$tr")"; [[ "$st" == <-> ]] || st=$(zstat +mtime "$tr" 2>/dev/null || date +%s)
+    helpers+=("${st}"$'\x1f'"${mt}")
+  done
+  if ((${#helpers})); then
+    helpers=(${(On)helpers})   # newest start first
+    IFS=$'\x1f' read -r HELPER_START HELPER_TYPE <<<"${helpers[1]}"
+    HELPER_MORE=$((${#helpers} - 1))
+  fi
+fi
+
+# Estimate: median seconds of past finished runs of one helper type, across all sessions.
+# Runs over 2 hours are left out (a resumed helper reads days); under 3 runs writes 0.
+# Run in the background and cached per type for an hour, so a redraw only reads a file.
+estimate_bg() {   # $1 helper type  $2 cache file
+  local metas f d ds=() n
+  metas=("$CLAUDE_DIR"/projects/*/*/subagents/agent-*.meta.json(N.))
+  ((${#metas})) && for f in ${(f)"$(json_lines "${metas[@]}" | jq -nrR --arg t "$1" 'inputs | index("\t") as $i
+      | select((.[$i + 1:] | fromjson? | (.agentType == $t and .finished == true)) // false) | .[:$i]' 2>/dev/null)"}; do
+    d="$({ head -n 1 -- "${f%.meta.json}.jsonl"; tail -n 3 -- "${f%.meta.json}.jsonl"; } 2>/dev/null | jq -nrR '
+      [inputs | fromjson? | .timestamp? | strings | (sub("\\.[0-9]+Z$"; "Z") | fromdate)?]
+      | if length >= 2 then (last - first | floor) else empty end' 2>/dev/null)"
+    [[ "$d" == <-> ]] && ((d > 0 && d <= 7200)) && ds+=($d)
+  done
+  ds=(${(n)ds}); n=${#ds}
+  if ((n < 3)); then print 0; else print ${ds[$(((n + 1) / 2))]}; fi >"$2.$$" && mv -f "$2.$$" "$2"
+}
+if [[ -n "$HELPER_TYPE" ]] && ((CACHE_OK)); then
+  EST_CACHE="$CACHE_DIR/est-$(key "$HELPER_TYPE")"
+  [[ -s "$EST_CACHE" ]] && HELPER_EST=$(to_int "$(<"$EST_CACHE")")
+  ttl=3600; [[ -s "$EST_CACHE" ]] || ttl=300
+  if [[ ! -f "$EST_CACHE" ]] || (($(age "$EST_CACHE") > ttl)); then
+    touch "$EST_CACHE" 2>/dev/null   # one estimate at a time
+    ( estimate_bg "$HELPER_TYPE" "$EST_CACHE" ) </dev/null >/dev/null 2>&1 &!
+  fi
+fi
+HELPER_TYPE="${HELPER_TYPE//[[:cntrl:]]/}"
+((${#HELPER_TYPE} > 24)) && HELPER_TYPE="${HELPER_TYPE[1,23]}…"
+
+# Running time: 45s / 3m12s / 1h05m. Estimate: ~45s / ~7m / ~1h05m.
+dur() {
+  local s=$1; ((s < 0)) && s=0
+  if ((s < 60)); then printf '%ds' $s
+  elif ((s < 3600)); then printf '%dm%02ds' $((s / 60)) $((s % 60))
+  else printf '%dh%02dm' $((s / 3600)) $((s % 3600 / 60)); fi
+}
+est_fmt() {
+  local m=$((($1 + 30) / 60))
+  if (($1 < 60)); then printf '~%ds' $1
+  elif ((m < 60)); then printf '~%dm' $m
+  else printf '~%dh%02dm' $((m / 60)) $((m % 60)); fi
+}
+
+progress_parts() {   # $1 = 1 to name the task in progress
+  local p el pct
+  pparts=()
+  if ((TASKS_ALL)); then
+    p="${MUTED}tasks${RESET} $(cells $((TASKS_DONE * 100 / TASKS_ALL))) ${TEXT}${TASKS_DONE}/${TASKS_ALL}${RESET}"
+    (($1)) && [[ -n "$TASK_NOW" ]] && p+=" ${MUTED}·${RESET} ${TEXT}${TASK_NOW}${RESET}"
+    pparts+=("$p")
+  fi
+  if [[ -n "$HELPER_TYPE" ]]; then
+    el=$(($(date +%s) - HELPER_START)); ((el < 0)) && el=0
+    p="${MUTED}⧗ ${HELPER_TYPE}${RESET}"
+    if ((HELPER_EST > 0)); then
+      pct=$((el * 100 / HELPER_EST))
+      if ((pct < 100)); then p+=" $(cells $pct) ${MUTED}~${pct}% $(dur $el) of $(est_fmt $HELPER_EST)${RESET}"
+      else p+=" $(cells 100 "" "$ORANGE") ${ORANGE}$(dur $el) of $(est_fmt $HELPER_EST)${RESET}"; fi
+    else p+=" ${TEXT}$(dur $el)${RESET}"; fi
+    ((HELPER_MORE)) && p+=" ${MUTED}+${HELPER_MORE}${RESET}"
+    pparts+=("$p")
+  fi
+}
+# Widest bars that fit one row; at 4 cells, drop the task name, then wrap.
+for BAR_W in 10 8 6 4; do progress_parts 1; fits "${pparts[@]}" && break; done
+fits "${pparts[@]}" || progress_parts 0
+
 ((${#rows})) && printf '%s\n' "${rows[@]}"
 ((${#parts})) && emit "${parts[@]}"
+((${#pparts})) && emit "${pparts[@]}"
 exit 0

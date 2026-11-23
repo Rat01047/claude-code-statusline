@@ -29,3 +29,7 @@ TICKET_MAX=40
 
 # PR title from `gh pr view` (run in the background, cached for an hour). 0 = never call gh.
 PR_TITLES=1
+
+# Progress row: Claude's task list for this session and any helper agent still running.
+# 0 = never shown, and the task and helper files are never read.
+SHOW_PROGRESS=1
