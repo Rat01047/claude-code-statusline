@@ -16,9 +16,9 @@
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
 #   limit at 70% or more. "ctx 1M" names a context window that is not 200k.
-# Row 3, only while something is in progress: Claude's task list (done of total, the task in
+# Row 3: Claude's task list (done of total, the task in
 #   progress) and the newest helper agent still running, with a bar estimated from that
-#   type's past runs, marked ~. SHOW_PROGRESS=0 hides it.
+#   type's past runs, marked ~. Dim "no helpers running" when idle. SHOW_PROGRESS=0 hides it.
 #   tasks ■■■■■■□□□□ 6/9 · Review the diff │ ⧗ advisor ■■■■□□□□□□ ~45% 3m12s of ~7m
 #
 # Settings: ${CLAUDE_STATUSLINE_CONF:-~/.config/claude-statusline/config.zsh}, see
@@ -491,6 +491,9 @@ progress_parts() {   # $1 = 1 to name the task in progress
     ((HELPER_MORE)) && p+=" ${MUTED}+${HELPER_MORE}${RESET}"
     pparts+=("$p")
   fi
+  # Nothing in progress: a dim line, so the row is always there in a Claude Code session.
+  ((${#pparts} == 0 && SHOW_PROGRESS)) && [[ "$SID" == [[:alnum:]-]## ]] \
+    && pparts=("${MUTED}⧗ no helpers running · no task list${RESET}")
 }
 # Widest bars that fit one row; at 4 cells, drop the task name, then wrap.
 for BAR_W in 10 8 6 4; do progress_parts 1; fits "${pparts[@]}" && break; done

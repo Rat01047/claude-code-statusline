@@ -47,7 +47,7 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 
 ![On a PR branch](docs/screenshots/pr.svg)
 
-**Row 3**, only while something is in progress: tasks │ running helper
+**Row 3**: tasks │ running helper. With nothing in progress it is a dim `⧗ no helpers running · no task list`.
 
 ![Progress row: Claude's task list and a running advisor, on track](docs/screenshots/progress.svg)
 
