@@ -13,7 +13,7 @@ trap 'rm -rf "$W"' EXIT
 mkdir -p $W/home $W/tmp $W/bin
 export HOME=$W/home TMPDIR=$W/tmp XDG_CONFIG_HOME=$W/xdg
 export CLAUDE_CONFIG_DIR=$FX/work CLAUDE_STATUSLINE_CONF=$FX/config.zsh
-unset CLAUDE_TASK
+unset CLAUDE_TASK CLAUDE_CODE_AUTO_COMPACT_WINDOW   # the cap test sets it itself
 
 A=$W/Acme-Shop
 T="$A/tickets/2026-10-28 [#42] Coupon-applies-twice"
@@ -71,6 +71,20 @@ check "all limits under 70%: no reset time" "$R" '[[ "$R" != *"↻"* ]]'
 # 2b. Context label: window size other than 200k, and the over-200k warning.
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
 check "1M window: label reads ctx 1M" "$P" '[[ "$(line "$P" 2)" == "ctx 1M "* ]]'
+
+# An auto-compact cap below the window (CLAUDE_CODE_AUTO_COMPACT_WINDOW): compaction comes at
+# the cap, so the label names the cap and the bar fills against it. At or above the window,
+# or on a 200k window, nothing changes.
+runcap() { print -r -- "$2" | env CLAUDE_CODE_AUTO_COMPACT_WINDOW=$1 COLUMNS=$3 "$F"; }
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
+check "700k cap on a 1M window: label reads ctx 700k, percent is of the cap (27% of 1M = 39%)" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 700k "* && "$(line "$P" 2)" == *" 39% │ 5h "* ]]'
+R=$(runcap 2000000 "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
+check "cap at or above the window: label and percent unchanged (ctx 1M 40%)" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 1M "* && "$(line "$P" 2)" == *" 40% │ 5h "* ]]'
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20)" 157); P=$(print -r -- "$R" | strip)
+check "cap on a 200k window: ignored, label stays ctx" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx "* && "$(line "$P" 2)" == *" 27% │ 5h "* ]]'
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.exceeds_200k_tokens = true')" 157)
 check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mctx >200k"* ]]'
 

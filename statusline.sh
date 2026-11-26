@@ -15,7 +15,9 @@
 #   the percent is green below 50%, yellow to 79%, red from 80%.
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
-#   limit at 70% or more. "ctx 1M" names a context window that is not 200k.
+#   limit at 70% or more. "ctx 1M" names a context window that is not 200k. When
+#   CLAUDE_CODE_AUTO_COMPACT_WINDOW sets a cap below the window, the label names the cap
+#   ("ctx 700k") and the bar fills against it, because compaction comes at the cap.
 # Row 3: Claude's task list (done of total, the task in
 #   progress) and the newest helper agent still running, with a bar estimated from that
 #   type's past runs, marked ~. Dim "no helpers running" when idle. SHOW_PROGRESS=0 hides it.
@@ -351,11 +353,16 @@ limit_part() {   # $1 label  $2 percent  $3 resets_at  $4 pace
 limit_parts() {
   parts=()
   if [[ -n "$CTX" ]]; then
-    local size="$(to_int "$CTX_SIZE")" label="ctx"
-    ((size > 0 && size != 200000)) && label+=" $(tokens $size)"
+    local size="$(to_int "$CTX_SIZE")" label="ctx" pct="$CTX"
+    local cap="$(to_int "$CLAUDE_CODE_AUTO_COMPACT_WINDOW")"
+    if ((cap >= 100000 && size > 0 && cap < size)); then
+      # Compaction comes at the cap, not the window: name the cap, fill the bar against it.
+      pct=$(( ($(to_int "$CTX") * size + cap / 2) / cap ))
+      label+=" $(tokens $cap)"
+    elif ((size > 0 && size != 200000)); then label+=" $(tokens $size)"; fi
     if [[ "$BIG" == "true" ]]; then label="${RED}${label} >200k${RESET}"
     else label="${MUTED}${label}${RESET}"; fi
-    parts+=("$(limit_part "$label" "$CTX" "" "")")
+    parts+=("$(limit_part "$label" "$pct" "" "")")
   fi
   [[ -n "$R5" ]] && parts+=("$(limit_part "${MUTED}5h${RESET}" "$R5" "$R5_AT" "$P5")")
   [[ -n "$R7" ]] && parts+=("$(limit_part "${MUTED}7d${RESET}" "$R7" "$R7_AT" "$P7")")

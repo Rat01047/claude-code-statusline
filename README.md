@@ -34,6 +34,8 @@ The images on this page are drawn from made-up sessions by `tools/screenshots.sh
 
 **Row 2**: ctx (context window) │ 5h │ 7d │ cost
 
+With `CLAUDE_CODE_AUTO_COMPACT_WINDOW` set below the window, ctx names the cap instead (`ctx 700k`) and its bar fills against the cap, since that is where compaction comes.
+
 - Bars fill green → yellow → orange → red along the track. The percent is green below 50%,
   yellow to 79%, red from 80%.
 - The pink **│** on the 5h and 7d bars is **pace**: how much of that window has already
