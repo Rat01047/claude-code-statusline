@@ -13,7 +13,7 @@ trap 'rm -rf "$W"' EXIT
 mkdir -p $W/home $W/tmp $W/bin
 export HOME=$W/home TMPDIR=$W/tmp XDG_CONFIG_HOME=$W/xdg
 export CLAUDE_CONFIG_DIR=$FX/work CLAUDE_STATUSLINE_CONF=$FX/config.zsh
-unset CLAUDE_TASK
+unset CLAUDE_TASK CLAUDE_CODE_AUTO_COMPACT_WINDOW   # the cap test sets it itself
 
 A=$W/Acme-Shop
 T="$A/tickets/2026-10-28 [#42] Coupon-applies-twice"
@@ -71,8 +71,28 @@ check "all limits under 70%: no reset time" "$R" '[[ "$R" != *"↻"* ]]'
 # 2b. Context label: window size other than 200k, and the over-200k warning.
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
 check "1M window: label reads ctx 1M" "$P" '[[ "$(line "$P" 2)" == "ctx 1M "* ]]'
+
+# An auto-compact cap below the window (CLAUDE_CODE_AUTO_COMPACT_WINDOW): compaction comes at
+# the cap, so the label names the cap and the bar fills against it. At or above the window,
+# or on a 200k window, nothing changes.
+runcap() { print -r -- "$2" | env CLAUDE_CODE_AUTO_COMPACT_WINDOW=$1 COLUMNS=$3 "$F"; }
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
+check "700k cap on a 1M window: label reads ctx 700k, percent is of the cap (27% of 1M = 39%)" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 700k "* && "$(line "$P" 2)" == *" 39% │ 5h "* ]]'
+R=$(runcap 2000000 "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000')" 157); P=$(print -r -- "$R" | strip)
+check "cap at or above the window: label and percent unchanged (ctx 1M 40%)" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 1M "* && "$(line "$P" 2)" == *" 40% │ 5h "* ]]'
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20)" 157); P=$(print -r -- "$R" | strip)
+check "cap on a 200k window: ignored, label stays ctx" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx "* && "$(line "$P" 2)" == *" 27% │ 5h "* ]]'
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.exceeds_200k_tokens = true')" 157)
 check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mctx >200k"* ]]'
+# Past 200k on a bigger limit is the normal state, not a warning: no flag, label not red.
+R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000 | .exceeds_200k_tokens = true')" 157); P=$(print -r -- "$R" | strip)
+check "1M window over 200k tokens: no >200k flag, label not red" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 1M "* && "$P" != *">200k"* && "$R" != *"38;2;255;85;85mctx"* ]]'
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20 | jq -c '.context_window.context_window_size = 1000000 | .exceeds_200k_tokens = true')" 157); P=$(print -r -- "$R" | strip)
+check "700k cap over 200k tokens: no >200k flag" "$P" '[[ "$(line "$P" 2)" == "ctx 700k "* && "$P" != *">200k"* ]]'
 
 # 3. Project root: no ticket. Tab opened in the home folder: folder comes from the working folder.
 P=$(run "$(mk "$A" "$A" 40 30 20)" 157 | strip)
@@ -235,8 +255,9 @@ runp() { print -r -- "$1" | CLAUDE_CONFIG_DIR=$CFG COLUMNS=${2:-157} "$F"; }
 P=$(runp "$(mks)" | strip)
 check "tasks: third row counts done of total, skips unknown status and bad files, names the task in progress" "$P" \
   '(( $(print -r -- "$P" | wc -l) == 3 )) && [[ "$(line "$P" 3)" == "tasks ██████░░░░ 6/9 · Review the diff" ]]'
-P=$(runp "$(mks s-2)" | strip)
-check "tasks: no task list for this session, no third row" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+R=$(runp "$(mks s-2)"); P=$(print -r -- "$R" | strip)
+check "tasks: no task list for this session, a dim idle line" "$P" '[[ "$(line "$P" 3)" == "⧗ no helpers running · no task list" ]]'
+check "idle line is grey" "$R" '[[ "$R" == *$'"'"'\e[38;2;98;114;164m⧗ no helpers running'"'"'* ]]'
 P=$(runp "$(mks ../tasks/s-1)" | strip)
 check "tasks: a session id with a path in it reads nothing, even one that leads to a task list" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
 print -r -- "source $FX/config.zsh; SHOW_PROGRESS=0" >$W/noprog.zsh
@@ -248,7 +269,7 @@ check "tasks: escape codes in a task subject print as text" "$(print -r -- "$R" 
   '[[ "$NOSGR" != *[[:cntrl:]]* && "$(print -r -- "$R" | strip)" == *"· Evil]0;pwnedtask"* ]]'
 task 7 completed "Review the diff"; task 8 completed "Later"; task 9 completed "Later still"
 P=$(runp "$(mks)" | strip)
-check "tasks: all completed, no third row" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+check "tasks: all completed, the idle line" "$P" '[[ "$(line "$P" 3)" == "⧗ no helpers running · no task list" ]]'
 task 7 in_progress "Review the diff"; task 8 pending "Later"; task 9 pending "Later still"
 
 # 13. Progress row: helper agents still running in this session, from
@@ -297,11 +318,11 @@ rm -rf $CFG/projects/-x-Acme-Shop/s-3
 
 n=$(date +%s); agent s-3 f1 advisor $((n - 300)) 1 $((n - 10))
 P=$(runp "$(mks s-3)" | strip)
-check "helper: a finished helper is not shown" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+check "helper: a finished helper is not shown, the idle line instead" "$P" '[[ "$(line "$P" 3)" == "⧗ no helpers running · no task list" ]]'
 agent s-3 st1 advisor $((n - 4000)) 0
 touch -t $(strftime '%Y%m%d%H%M' $((n - 3600))) $CFG/projects/-x-Acme-Shop/s-3/subagents/agent-st1.jsonl
 P=$(runp "$(mks s-3)" | strip)
-check "helper: one silent for 30 minutes is not shown" "$P" '(( $(print -r -- "$P" | wc -l) == 2 ))'
+check "helper: one silent for 30 minutes is not shown, the idle line instead" "$P" '[[ "$(line "$P" 3)" == "⧗ no helpers running · no task list" ]]'
 
 n=$(date +%s); agent s-4 a1 advisor $((n - 192)) 0; agent s-4 a2 advisor $((n - 60)) 0
 P=$(runp "$(mks s-4)" | strip)

@@ -15,10 +15,13 @@
 #   the percent is green below 50%, yellow to 79%, red from 80%.
 #   The pink │ on 5h and 7d is pace: how much of that window has passed. Fill ahead of it
 #   means you are spending faster than the window refills. The reset time shows only on a
-#   limit at 70% or more. "ctx 1M" names a context window that is not 200k.
-# Row 3, only while something is in progress: Claude's task list (done of total, the task in
+#   limit at 70% or more. "ctx 1M" names a context window that is not 200k. When
+#   CLAUDE_CODE_AUTO_COMPACT_WINDOW sets a cap below the window, the label names the cap
+#   ("ctx 700k") and the bar fills against it, because compaction comes at the cap.
+#   The red ">200k" marker shows only while 200k is the limit.
+# Row 3: Claude's task list (done of total, the task in
 #   progress) and the newest helper agent still running, with a bar estimated from that
-#   type's past runs, marked ~. SHOW_PROGRESS=0 hides it.
+#   type's past runs, marked ~. Dim "no helpers running" when idle. SHOW_PROGRESS=0 hides it.
 #   tasks ■■■■■■□□□□ 6/9 · Review the diff │ ⧗ advisor ■■■■□□□□□□ ~45% 3m12s of ~7m
 #
 # Settings: ${CLAUDE_STATUSLINE_CONF:-~/.config/claude-statusline/config.zsh}, see
@@ -351,11 +354,17 @@ limit_part() {   # $1 label  $2 percent  $3 resets_at  $4 pace
 limit_parts() {
   parts=()
   if [[ -n "$CTX" ]]; then
-    local size="$(to_int "$CTX_SIZE")" label="ctx"
-    ((size > 0 && size != 200000)) && label+=" $(tokens $size)"
-    if [[ "$BIG" == "true" ]]; then label="${RED}${label} >200k${RESET}"
+    local size="$(to_int "$CTX_SIZE")" label="ctx" pct="$CTX"
+    local cap="$(to_int "$CLAUDE_CODE_AUTO_COMPACT_WINDOW")" limit="$size"
+    if ((cap >= 100000 && size > 0 && cap < size)); then
+      # Compaction comes at the cap, not the window: name the cap, fill the bar against it.
+      pct=$(( ($(to_int "$CTX") * size + cap / 2) / cap ))
+      label+=" $(tokens $cap)"; limit=$cap
+    elif ((size > 0 && size != 200000)); then label+=" $(tokens $size)"; fi
+    # Past 200k is a warning only when 200k is the limit; on a bigger limit it is the normal state.
+    if [[ "$BIG" == "true" ]] && ((limit <= 200000)); then label="${RED}${label} >200k${RESET}"
     else label="${MUTED}${label}${RESET}"; fi
-    parts+=("$(limit_part "$label" "$CTX" "" "")")
+    parts+=("$(limit_part "$label" "$pct" "" "")")
   fi
   [[ -n "$R5" ]] && parts+=("$(limit_part "${MUTED}5h${RESET}" "$R5" "$R5_AT" "$P5")")
   [[ -n "$R7" ]] && parts+=("$(limit_part "${MUTED}7d${RESET}" "$R7" "$R7_AT" "$P7")")
@@ -491,6 +500,9 @@ progress_parts() {   # $1 = 1 to name the task in progress
     ((HELPER_MORE)) && p+=" ${MUTED}+${HELPER_MORE}${RESET}"
     pparts+=("$p")
   fi
+  # Nothing in progress: a dim line, so the row is always there in a Claude Code session.
+  ((${#pparts} == 0 && SHOW_PROGRESS)) && [[ "$SID" == [[:alnum:]-]## ]] \
+    && pparts=("${MUTED}⧗ no helpers running · no task list${RESET}")
 }
 # Widest bars that fit one row; at 4 cells, drop the task name, then wrap.
 for BAR_W in 10 8 6 4; do progress_parts 1; fits "${pparts[@]}" && break; done
