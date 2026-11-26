@@ -87,6 +87,12 @@ check "cap on a 200k window: ignored, label stays ctx" "$P" \
   '[[ "$(line "$P" 2)" == "ctx "* && "$(line "$P" 2)" == *" 27% │ 5h "* ]]'
 R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.exceeds_200k_tokens = true')" 157)
 check "over 200k tokens: label turns red and says >200k" "$R" '[[ "$R" == *"38;2;255;85;85mctx >200k"* ]]'
+# Past 200k on a bigger limit is the normal state, not a warning: no flag, label not red.
+R=$(run "$(mk "$T" "$A" 40 30 20 | jq -c '.context_window.context_window_size = 1000000 | .exceeds_200k_tokens = true')" 157); P=$(print -r -- "$R" | strip)
+check "1M window over 200k tokens: no >200k flag, label not red" "$P" \
+  '[[ "$(line "$P" 2)" == "ctx 1M "* && "$P" != *">200k"* && "$R" != *"38;2;255;85;85mctx"* ]]'
+R=$(runcap 700000 "$(mk "$T" "$A" 27 30 20 | jq -c '.context_window.context_window_size = 1000000 | .exceeds_200k_tokens = true')" 157); P=$(print -r -- "$R" | strip)
+check "700k cap over 200k tokens: no >200k flag" "$P" '[[ "$(line "$P" 2)" == "ctx 700k "* && "$P" != *">200k"* ]]'
 
 # 3. Project root: no ticket. Tab opened in the home folder: folder comes from the working folder.
 P=$(run "$(mk "$A" "$A" 40 30 20)" 157 | strip)

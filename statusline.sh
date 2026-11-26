@@ -18,6 +18,7 @@
 #   limit at 70% or more. "ctx 1M" names a context window that is not 200k. When
 #   CLAUDE_CODE_AUTO_COMPACT_WINDOW sets a cap below the window, the label names the cap
 #   ("ctx 700k") and the bar fills against it, because compaction comes at the cap.
+#   The red ">200k" marker shows only while 200k is the limit.
 # Row 3: Claude's task list (done of total, the task in
 #   progress) and the newest helper agent still running, with a bar estimated from that
 #   type's past runs, marked ~. Dim "no helpers running" when idle. SHOW_PROGRESS=0 hides it.
@@ -354,13 +355,14 @@ limit_parts() {
   parts=()
   if [[ -n "$CTX" ]]; then
     local size="$(to_int "$CTX_SIZE")" label="ctx" pct="$CTX"
-    local cap="$(to_int "$CLAUDE_CODE_AUTO_COMPACT_WINDOW")"
+    local cap="$(to_int "$CLAUDE_CODE_AUTO_COMPACT_WINDOW")" limit="$size"
     if ((cap >= 100000 && size > 0 && cap < size)); then
       # Compaction comes at the cap, not the window: name the cap, fill the bar against it.
       pct=$(( ($(to_int "$CTX") * size + cap / 2) / cap ))
-      label+=" $(tokens $cap)"
+      label+=" $(tokens $cap)"; limit=$cap
     elif ((size > 0 && size != 200000)); then label+=" $(tokens $size)"; fi
-    if [[ "$BIG" == "true" ]]; then label="${RED}${label} >200k${RESET}"
+    # Past 200k is a warning only when 200k is the limit; on a bigger limit it is the normal state.
+    if [[ "$BIG" == "true" ]] && ((limit <= 200000)); then label="${RED}${label} >200k${RESET}"
     else label="${MUTED}${label}${RESET}"; fi
     parts+=("$(limit_part "$label" "$pct" "" "")")
   fi
